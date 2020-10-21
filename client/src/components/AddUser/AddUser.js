@@ -98,11 +98,11 @@ class AddUser extends React.Component {
         password: password.value,
       }
 
-      axios.post("http://localhost:5000/addUser", user)
+      axios.post("/addUser", user)
         .then(res => {
-          console.log("Użytkownik został dodany do bazy danych")
+          console.log(res.data)
           this.setState({
-            registerSuccess: true
+            registerSuccess: res.data
           })
         })
         .catch(err => {
@@ -113,7 +113,7 @@ class AddUser extends React.Component {
   render() {
     return (
       <div id="AddUser">
-        {!this.state.registerSuccess ? <div className="add-user-form">
+        {this.state.registerSuccess !== "Rejestracja przebiegła pomyślnie" ? <div className="add-user-form">
           <form onSubmit={this.addUser}>
             <label>Nazwa firmy:
           <input type="text" name="company" value={this.state.company.value} onChange={this.handleChange}></input></label>
@@ -136,10 +136,10 @@ class AddUser extends React.Component {
             <p>{this.state.password2.error}</p>
             <button type="submit">Zarejestruj użytkownika</button>
           </form>
+          <h5>{this.state.registerSuccess}</h5>
         </div> :
           <div className="add-user-form-success">
-            <h1>Rejestracja przebiegła</h1>
-            <h1>pomyślnie</h1>
+            <h1>{this.state.registerSuccess}</h1>
             <button onClick={() => this.props.history.push("/login")}>Zaloguj</button>
           </div>}
       </div>

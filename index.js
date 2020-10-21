@@ -14,6 +14,8 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb', extended: true }));
 
+app.use(express.static(path.join(__dirname, "./client/build")));
+
 const mongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://127.0.0.1:27017';
 const dbname = 'e-commerce-integrators';
@@ -42,16 +44,31 @@ mongoClient.connect(url, {}, (error, client) => {
               email: user.email,
               password: user.password
             }, (error, result) => {
-              if (error)
+              if (error) {
+                res.send("Rejestracja nie powiodła się");
                 console.log("Nie udało się dodać użytkownika", error)
-
-              console.log(result.ops)
+              } else {
+                res.send("Rejestracja przebiegła pomyślnie");
+                console.log(result.ops)
+              }
             })
           } else {
+            res.send("Użytkownik o podanym adresie e-mail już istnieje w naszej bazie danych");
             console.log("Użytkownik o podanym adresie e-mail już istnieje w naszej bazie danych")
           }
         }
       })
+    })
+    app.use((req, res, next) => {
+      res.sendFile(path.join(__dirname, "./client/build", "index.html"));
+    });
+
+    db.collection('users').find({}).toArray((error, results) => {
+      if (error) {
+        console.log(error)
+      } else {
+        console.log(results)
+      }
     })
     console.log("Database connection is OK")
   }
