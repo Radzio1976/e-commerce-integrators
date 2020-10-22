@@ -59,6 +59,29 @@ mongoClient.connect(url, {}, (error, client) => {
         }
       })
     })
+
+    app.post('/login', (req, res) => {
+      const user = req.body;
+
+      db.collection('users').find({
+        email: user.email,
+        password: user.password
+      }).toArray((error, results) => {
+        if (error) {
+          res.send("Nie udało się pobrać informacji o takim użytkowniku")
+          console.log("Nie udało się pobrać informacji o takim użytkowniku")
+        } else {
+          if (results.length === 1) {
+            res.send(results[0].email)
+            console.log("Użytkownik zalogowany pomyślnie")
+          } else {
+            res.send("Niepoprawny adres email lub hasło")
+            console.log("Niepoprawny adres email lub hasło")
+          }
+        }
+      })
+    })
+
     app.use((req, res, next) => {
       res.sendFile(path.join(__dirname, "./client/build", "index.html"));
     });

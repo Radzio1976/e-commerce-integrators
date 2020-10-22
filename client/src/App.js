@@ -1,25 +1,52 @@
 import React from 'react';
-import logo from './logo.svg';
 import { createContext } from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import './App.css';
 import Home from './components/Home';
 import AddUser from './components/AddUser';
+import Login from './components/Login';
+
+const AuthContext = createContext();
 
 class App extends React.Component {
+  state = {
+    isAuth: false
+  }
+
+  componentDidMount() {
+    console.log(localStorage.getItem('email'));
+  }
+
+  login = (email) => {
+    localStorage.setItem('email', email);
+    this.setState({
+      isAuth: true
+    })
+  }
+
+  logout = () => {
+    localStorage.removeItem('email');
+    this.setState({
+      isAuth: false
+    })
+  }
 
   render() {
     return (
       <div id="App">
-        <BrowserRouter>
-          <Switch>
-            <Route path='/' exact component={Home} />
-            <Route path='/add-user' component={AddUser} />
-          </Switch>
-        </BrowserRouter>
+        <AuthContext.Provider value={{ login: this.login, logout: this.logout }}>
+          <BrowserRouter>
+            <Switch>
+              <Route path='/' exact component={Home} />
+              <Route path='/add-user' component={AddUser} />
+              <Route path='/login' component={Login} />
+            </Switch>
+          </BrowserRouter>
+        </AuthContext.Provider>
       </div>
     )
   }
 }
 
+export { AuthContext };
 export default App;
