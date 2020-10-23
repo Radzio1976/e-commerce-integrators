@@ -35,8 +35,9 @@ class AddUser extends React.Component {
       value: "",
       error: ""
     },
-    emaiExistError: "",
-    registerSuccess: false
+    registerError: "",
+    registerSuccess: false,
+    registerSuccessInfo: ""
   }
 
   handleChange = (e) => {
@@ -101,9 +102,22 @@ class AddUser extends React.Component {
       axios.post("/addUser", user)
         .then(res => {
           console.log(res.data)
-          this.setState({
-            registerSuccess: res.data
-          })
+          if (res.data.addUser === "error") {
+            this.setState({
+              registerError: res.data.info
+            })
+          }
+          if (res.data.addUser === false) {
+            this.setState({
+              registerError: res.data.info
+            })
+          }
+          if (res.data.addUser === true) {
+            this.setState({
+              registerSuccess: true,
+              registerSuccessInfo: res.data.info
+            })
+          }
         })
         .catch(err => {
           console.log("Nie udało się dodać użytkownika do bazy danych", err)
@@ -113,7 +127,7 @@ class AddUser extends React.Component {
   render() {
     return (
       <div id="AddUser">
-        {this.state.registerSuccess !== "Rejestracja przebiegła pomyślnie" ? <div className="add-user-form">
+        {!this.state.registerSuccess ? <div className="add-user-form">
           <form onSubmit={this.addUser}>
             <label>Nazwa firmy:
           <input type="text" name="company" value={this.state.company.value} onChange={this.handleChange}></input></label>
@@ -128,7 +142,6 @@ class AddUser extends React.Component {
             <label>Email:
             <input type="text" name="email" value={this.state.email.value} onChange={this.handleChange}></input></label>
             <p>{this.state.email.error}</p>
-            <p>{this.state.emaiExistError}</p>
             <label>Hasło:
             <input type="password" name="password" value={this.state.password.value} onChange={this.handleChange}></input></label>
             <label>Powtórz hasło:
@@ -136,10 +149,10 @@ class AddUser extends React.Component {
             <p>{this.state.password2.error}</p>
             <button type="submit">Zarejestruj użytkownika</button>
           </form>
-          <h5>{this.state.registerSuccess}</h5>
+          <h5>{this.state.registerError}</h5>
         </div> :
           <div className="add-user-form-success">
-            <h1>{this.state.registerSuccess}</h1>
+            <h1>{this.state.registerSuccessInfo}</h1>
             <button onClick={() => this.props.history.push("/login")}>Zaloguj</button>
           </div>}
       </div>

@@ -33,6 +33,7 @@ mongoClient.connect(url, {}, (error, client) => {
         email: user.email
       }).toArray((error, results) => {
         if (error) {
+          res.send({ addUser: "error", info: "Nie udało się pobrać danych na temat tego użytkownika" })
           console.log("Nie udało się pobrać danych na temat tego użytkownika")
         } else {
           if (results.length === 0) {
@@ -45,15 +46,15 @@ mongoClient.connect(url, {}, (error, client) => {
               password: user.password
             }, (error, result) => {
               if (error) {
-                res.send("Rejestracja nie powiodła się");
+                res.send({ addUser: "error", info: "Nie udało się dodać użytkownika" });
                 console.log("Nie udało się dodać użytkownika", error)
               } else {
-                res.send("Rejestracja przebiegła pomyślnie");
+                res.send({ addUser: true, info: "Rejestracja przebiegła pomyślnie" });
                 console.log(result.ops)
               }
             })
           } else {
-            res.send("Użytkownik o podanym adresie e-mail już istnieje w naszej bazie danych");
+            res.send({ addUser: false, info: "Użytkownik o podanym adresie e-mail już istnieje w naszej bazie danych" });
             console.log("Użytkownik o podanym adresie e-mail już istnieje w naszej bazie danych")
           }
         }
@@ -68,14 +69,14 @@ mongoClient.connect(url, {}, (error, client) => {
         password: user.password
       }).toArray((error, results) => {
         if (error) {
-          res.send("Nie udało się pobrać informacji o takim użytkowniku")
+          res.send({ isUserExist: "error", info: "Nie udało się pobrać informacji o takim użytkowniku" })
           console.log("Nie udało się pobrać informacji o takim użytkowniku")
         } else {
           if (results.length === 1) {
-            res.send("Success")
+            res.send({ isUserExist: true, info: "Użytkownik zalogowany pomyślnie" })
             console.log("Użytkownik zalogowany pomyślnie")
           } else {
-            res.send("Niepoprawny adres email lub hasło")
+            res.send({ isUserExist: false, info: "Niepoprawny adres email lub hasło" })
             console.log("Niepoprawny adres email lub hasło")
           }
         }

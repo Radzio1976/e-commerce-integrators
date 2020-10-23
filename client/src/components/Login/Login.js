@@ -26,17 +26,17 @@ class Login extends React.Component {
     axios.post("/login", user)
       .then(res => {
         console.log(res.data)
-        if (res.data === "Nie udało się pobrać informacji o takim użytkowniku") {
+        if (res.data.isUserExist === "error") {
           this.setState({
-            loginError: res.data
+            loginError: res.data.info
           })
         }
-        if (res.data === "Niepoprawny adres email lub hasło") {
+        if (res.data.isUserExist === false) {
           this.setState({
-            loginError: res.data
+            loginError: res.data.info
           })
         }
-        if (res.data === "Success") {
+        if (res.data.isUserExist === true) {
           login(email)
         }
       })
