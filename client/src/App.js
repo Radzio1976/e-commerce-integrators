@@ -5,37 +5,51 @@ import './App.css';
 import Home from './components/Home';
 import AddUser from './components/AddUser';
 import Login from './components/Login';
+import Nav from './components/Nav';
 
 const AuthContext = createContext();
 
 class App extends React.Component {
   state = {
-    isAuth: false
+    isAuth: false,
+    currentUser: ""
   }
 
   componentDidMount() {
-    console.log(localStorage.getItem('email'));
+    if (localStorage.getItem('email') === null) {
+      this.setState({
+        isAuth: false
+      })
+    } else {
+      this.setState({
+        isAuth: true
+      })
+    }
   }
 
   login = (email) => {
     localStorage.setItem('email', email);
     this.setState({
-      isAuth: true
+      isAuth: true,
+      currentUser: email
     })
   }
 
   logout = () => {
     localStorage.removeItem('email');
     this.setState({
-      isAuth: false
+      isAuth: false,
+      currentUser: ""
     })
   }
 
   render() {
+    console.log(this.state.isAuth)
     return (
       <div id="App">
-        <AuthContext.Provider value={{ login: this.login, logout: this.logout }}>
+        <AuthContext.Provider value={{ login: this.login, logout: this.logout, isAuth: this.state.isAuth, currentUser: this.state.currentUser }}>
           <BrowserRouter>
+            <Nav />
             <Switch>
               <Route path='/' exact component={Home} />
               <Route path='/add-user' component={AddUser} />

@@ -72,7 +72,7 @@ mongoClient.connect(url, {}, (error, client) => {
           console.log("Nie udało się pobrać informacji o takim użytkowniku")
         } else {
           if (results.length === 1) {
-            res.send(results[0].email)
+            res.send("Success")
             console.log("Użytkownik zalogowany pomyślnie")
           } else {
             res.send("Niepoprawny adres email lub hasło")

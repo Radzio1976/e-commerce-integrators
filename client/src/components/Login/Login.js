@@ -30,11 +30,13 @@ class Login extends React.Component {
           this.setState({
             loginError: res.data
           })
-        } else if (res.data === "Niepoprawny adres email lub hasło") {
+        }
+        if (res.data === "Niepoprawny adres email lub hasło") {
           this.setState({
             loginError: res.data
           })
-        } else {
+        }
+        if (res.data === "Success") {
           login(email)
         }
       })
@@ -46,17 +48,19 @@ class Login extends React.Component {
         {
           ({ isAuth, login }) => {
             return (
-              <div id="Login">
-                <h3>Zaloguj się</h3>
-                <form onSubmit={(e) => this.handleSubmit(e, login)}>
-                  <label>Email:
+              isAuth ?
+                <Redirect to="/" /> :
+                <div id="Login">
+                  <h3>Zaloguj się</h3>
+                  <form onSubmit={(e) => this.handleSubmit(e, login)}>
+                    <label>Email:
           <input type="text" name="email" value={this.state.email} onChange={this.handleChange}></input></label>
-                  <label>Hasło
+                    <label>Hasło
           <input type="password" name="password" value={this.state.password} onChange={this.handleChange}></input></label>
-                  <button>Zaloguj</button>
-                  <p>{this.state.loginError}</p>
-                </form>
-              </div>
+                    <button>Zaloguj</button>
+                    <p>{this.state.loginError}</p>
+                  </form>
+                </div>
             )
           }
         }
