@@ -6,6 +6,8 @@ import Home from './components/Home';
 import AddUser from './components/AddUser';
 import Login from './components/Login';
 import Nav from './components/Nav';
+import Admin from './components/Admin';
+import ShopGoldAmp from './components/ShopgoldAmp';
 
 const AuthContext = createContext();
 
@@ -18,11 +20,13 @@ class App extends React.Component {
   componentDidMount() {
     if (localStorage.getItem('email') === null) {
       this.setState({
-        isAuth: false
+        isAuth: false,
+        currentUser: ""
       })
     } else {
       this.setState({
-        isAuth: true
+        isAuth: true,
+        currentUser: localStorage.getItem('email')
       })
     }
   }
@@ -44,7 +48,6 @@ class App extends React.Component {
   }
 
   render() {
-    console.log(this.state.isAuth)
     return (
       <div id="App">
         <AuthContext.Provider value={{ login: this.login, logout: this.logout, isAuth: this.state.isAuth, currentUser: this.state.currentUser }}>
@@ -54,6 +57,8 @@ class App extends React.Component {
               <Route path='/' exact component={Home} />
               <Route path='/add-user' component={AddUser} />
               <Route path='/login' component={Login} />
+              <Route path='/admin' component={Admin} />
+              <Route path='/ShopGold-AMPPolska' component={ShopGoldAmp} />
             </Switch>
           </BrowserRouter>
         </AuthContext.Provider>

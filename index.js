@@ -83,17 +83,125 @@ mongoClient.connect(url, {}, (error, client) => {
       })
     })
 
+    app.post('/userIntegrators', (req, res) => {
+      const currentUser = req.body.currentUser;
+      let userIntegrators = [];
+      db.collection('users').find({
+        email: currentUser
+      }).toArray((error, result) => {
+        if (error) {
+          res.send("Nie udało się znależć użytkownika")
+          console.log("Nie udało się znależć użytkownika", error)
+        } else {
+          if (result.length === 1) {
+            // Ta część kodu sprawdza czy aktualnie zalogowany użytkownik posiada integrator ShopGold-AMPPolska. Jeżeli tak to dodaje jego nazwę do tablicy userIntegrators.
+            db.collection('ampPolska').find({
+              userID: result[0]._id
+            }).toArray((error, result) => {
+              if (error) {
+                res.send("Coś poszło nie tak")
+                console.log("Coś poszło nie tak", error)
+              } else {
+                if (result.length === 1) {
+                  userIntegrators.push("ShopGold-AMPPolska")
+                  res.send(userIntegrators)
+                }
+              }
+            })
+            // Ta część kodu sprawdza czy aktualnie zalogowany użytkownik posiada integrator ShopGold-FHSahs. Jeżeli tak to dodaje jego nazwę do tablicy userIntegrators.
+            db.collection('fhSahs').find({
+              userID: result[0]._id
+            }).toArray((error, result) => {
+              if (error) {
+                res.send("Coś poszło nie tak")
+                console.log("Coś poszło nie tak", error)
+              } else {
+                if (result.length === 1) {
+                  userIntegrators.push("ShopGold-FHSahs")
+                  res.send(userIntegrators)
+                }
+              }
+            })
+          }
+        }
+      })
+    })
+
+    app.post('/addAmpPolska', (req, res) => {
+      const ampAPI = req.body;
+      db.collection('users').find({
+        email: ampAPI.currentUser
+      }).toArray((error, result) => {
+        if (error) {
+          res.send("Nie udało się pobrać informacji o użytkowniku")
+          console.log("Nie udało się pobrać informacji o użytkowniku", error)
+        } else {
+          if (result.length === 1) {
+            db.collection('ampPolska').insertOne({
+              productsApi: ampAPI.productsApi,
+              qtyApi: ampAPI.qtyApi,
+              userID: result[0]._id
+            }, (error, result) => {
+              if (error) {
+                res.send("Nie udało się dodać danych API integratora AMP Polska")
+                console.log("Nie udało się dodać danych API integratora AMP Polska", error)
+              } else {
+                res.send("Dane API AMP Polska dodane pomyślnie")
+                console.log("Dane API AMP Polska dodane pomyślnie")
+              }
+            })
+          }
+        }
+      })
+    })
+
+    app.post('/ampPolskaAPI', (req, res) => {
+      const currentUser = req.body.currentUser;
+      db.collection('users').find({
+        email: currentUser
+      }).toArray((error, result) => {
+        if (error) {
+          res.send("Nie udało się znależć użytkownika")
+          console.log("Nie udało się znależć użytkownika", error)
+        } else {
+          if (result.length === 1) {
+            db.collection('ampPolska').find({
+              userID: result[0]._id
+            }).toArray((error, result) => {
+              if (error) {
+                res.send("Nie udało się pobrać informacji z bazy danych")
+                console.log("Nie udało się pobrać informacji z bazy danych", error)
+              } else {
+                if (result.length === 0) {
+                  res.send("Ten użytkownik nie ma dodanego integratora Shopgold AMP Polska")
+                  console.log("Ten użytkownik nie ma dodanego integratora Shopgold AMP Polska")
+                }
+                if (result.length === 1) {
+                  res.send({ productsApi: result[0].productsApi, qtyApi: result[0].qtyApi, isJoined: true })
+                }
+              }
+            })
+          }
+        }
+      })
+    })
+
     app.use((req, res, next) => {
       res.sendFile(path.join(__dirname, "./client/build", "index.html"));
     });
 
-    db.collection('users').find({}).toArray((error, results) => {
+    //db.collection('ampPolska').remove()
+    /*
+    db.collection('ampPolska').find({}).toArray((error, results) => {
       if (error) {
         console.log(error)
       } else {
         console.log(results)
       }
     })
+    */
+
+
     console.log("Database connection is OK")
   }
 })
