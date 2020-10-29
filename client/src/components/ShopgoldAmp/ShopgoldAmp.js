@@ -16,7 +16,11 @@ class ShopgoldAmp extends React.Component {
   }
 
   componentDidMount() {
-    axios.post("/ampPolskaAPI", { currentUser: this.state.currentUser })
+    const data = {
+      action: "getAmpApi",
+      currentUser: this.state.currentUser
+    }
+    axios.post("/shopgold-amppolska", data)
       .then(res => {
         console.log(res.data)
         this.setState({
@@ -39,7 +43,28 @@ class ShopgoldAmp extends React.Component {
 
   addApi = (e) => {
     e.preventDefault();
-    axios.post("/addAmpPolska", { currentUser: this.state.currentUser, productsApi: this.state.productsApi, qtyApi: this.state.qtyApi })
+    const data = {
+      action: "addAmpApi",
+      currentUser: this.state.currentUser,
+      productsApi: this.state.productsApi,
+      qtyApi: this.state.qtyApi
+    }
+    axios.post("/shopgold-amppolska", data)
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
+  getAMPProductsFile = () => {
+    console.log("Działa")
+    const data = {
+      action: "getAMPProductsFile",
+      currentUser: this.state.currentUser
+    }
+    axios.post("/shopgold-amppolska", data)
       .then(res => {
         console.log(res.data)
       })

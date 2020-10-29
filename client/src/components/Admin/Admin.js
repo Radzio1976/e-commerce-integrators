@@ -12,10 +12,10 @@ class Admin extends React.Component {
 
   componentDidMount() {
     const userIntegrators = this.state.userIntegrators;
-    const user = {
+    const data = {
       currentUser: this.state.currentUser
     }
-    axios.post("/userIntegrators", user)
+    axios.post("/users-integrators", data)
       .then(res => {
         console.log(res.data)
         this.setState({
