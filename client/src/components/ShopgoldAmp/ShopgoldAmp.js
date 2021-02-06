@@ -73,6 +73,35 @@ class ShopgoldAmp extends React.Component {
       })
   }
 
+  getAMPUpdateFile = () => {
+    console.log("Działa")
+    const data = {
+      action: "getAMPUpdateFile",
+      currentUser: this.state.currentUser
+    }
+    axios.post("/shopgold-amppolska", data)
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
+  getAMPPricesFile = () => {
+    const data = {
+      action: "getAMPPricesFile",
+      currentUser: this.state.currentUser
+    }
+    axios.post("/shopgold-amppolska", data)
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
   render() {
     return (
       <AuthContext.Consumer>
@@ -104,6 +133,7 @@ class ShopgoldAmp extends React.Component {
                   <div id="getAmpDataButtons">
                     <button onClick={this.getAMPProductsFile}>Pobierz plik z bazą produktów</button>
                     <button onClick={this.getAMPUpdateFile}>Pobierz plik aktualizacyjny</button>
+                    <button onClick={this.getAMPPricesFile}>Pobierz plik z cenami</button>
                   </div>
 
                 </div> :
