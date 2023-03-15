@@ -20,7 +20,7 @@ class ShopgoldAmp extends React.Component {
       action: "getAmpApi",
       currentUser: this.state.currentUser
     }
-    axios.post("/shopgold-amppolska", data)
+    axios.post("/shopGold-ampPolska", data)
       .then(res => {
         console.log(res.data)
         this.setState({

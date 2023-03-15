@@ -17,6 +17,8 @@ app.use(express.static(path.join(__dirname, "./client/build")));
 const addUser = require('./httpRequests/addUser');
 const login = require('./httpRequests/login');
 const usersIntegrators = require('./httpRequests/usersIntegrators');
+const shopGoldAmpPolska = require('./httpRequests/shopGoldAmpPolska');
+const addAmpApi = require('./httpRequests/addAmpApi');
 
 const mongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://127.0.0.1:27017';
@@ -40,7 +42,7 @@ mongoClient.connect(url, {}, (error, client) => {
       usersIntegrators(req, res, db);
     })
 
-    app.post('/shopgold-amppolska', (req, res) => {
+    app.post('/shopGold-ampPolska', (req, res) => {
       const data = req.body;
       db.collection('users').find({
         email: data.currentUser
@@ -49,24 +51,11 @@ mongoClient.connect(url, {}, (error, client) => {
           res.send("Nie udało się znależć użytkownika")
           console.log("Nie udało się znależć użytkownika", error)
         } else {
-          if (result.length === 1) {
-
+          if (result.length === 1) {  
             if (data.action === "addAmpApi") {
-              db.collection('ampPolska').insertOne({
-                productsApi: data.productsApi,
-                qtyApi: data.qtyApi,
-                userID: result[0]._id
-              }, (error, result) => {
-                if (error) {
-                  res.send("Nie udało się dodać danych API integratora AMP Polska")
-                  console.log("Nie udało się dodać danych API integratora AMP Polska", error)
-                } else {
-                  res.send("Dane API AMP Polska dodane pomyślnie")
-                  console.log("Dane API AMP Polska dodane pomyślnie")
-                }
-              })
-            }
-
+              addAmpApi(req, res, db, data, result);
+            };
+  
             if (data.action === "getAmpApi") {
               db.collection('ampPolska').find({
                 userID: result[0]._id
@@ -85,7 +74,7 @@ mongoClient.connect(url, {}, (error, client) => {
                 }
               })
             }
-
+  
             if (data.action === "getAMPProductsFile") {
               db.collection('ampPolska').find({
                 userID: result[0]._id
@@ -103,7 +92,7 @@ mongoClient.connect(url, {}, (error, client) => {
                       //const url = process.env.AMP_PRODUCTS_API_URL
                       const url = result[0].productsApi;
                       const userId = result[0].userID;
-
+  
                       console.log('Connecting …')
                       const { data, headers } = await axios({
                         url,
@@ -111,7 +100,7 @@ mongoClient.connect(url, {}, (error, client) => {
                         responseType: 'stream'
                       })
                       const totalLength = headers['content-length']
-
+  
                       console.log('Starting download')
                       const progressBar = new ProgressBar('-> downloading [:bar] :percent :etas', {
                         width: 40,
@@ -120,11 +109,11 @@ mongoClient.connect(url, {}, (error, client) => {
                         renderThrottle: 1,
                         total: parseInt(totalLength)
                       })
-
+  
                       const writer = fs.createWriteStream(
                         path.resolve(__dirname, 'input', 'ampproducts.xml')
                       )
-
+  
                       data.on('data', (chunk) => progressBar.tick(chunk.length))
                       data.pipe(writer)
                       data.on('end', function () {
@@ -140,36 +129,36 @@ mongoClient.connect(url, {}, (error, client) => {
                                 let items = result.products.product//.slice(2038, 2039);
                                 let names = [];
                                 let urls = [];
-
+  
                                 for (let i = 0; i < items.length; i++) {
                                   delete items[i].sku;
-
+  
                                   delete items[i].url;
-
+  
                                   delete items[i].attributes;
-
+  
                                   delete items[i].PKWiU;
-
+  
                                   delete items[i].inStock;
-
+  
                                   delete items[i].availability;
-
+  
                                   delete items[i].requiredBox;
-
+  
                                   delete items[i].quantityPerBox;
-
+  
                                   delete items[i].priceAfterDiscountNet;
-
+  
                                   delete items[i].vat;
-
+  
                                   delete items[i].model;
-
+  
                                   items[i].Podatek_Vat = "23";
-
+  
                                   items[i].Darmowa_dostawa = "nie";
-
+  
                                   if (items[i].brand === undefined) {
-
+  
                                     items[i].Producent = {
                                       __cdata: []
                                     };
@@ -180,21 +169,21 @@ mongoClient.connect(url, {}, (error, client) => {
                                     };
                                     delete items[i].brand
                                   }
-
+  
                                   items[i].Termin_wysylki = {
                                     __cdata: ["48 godzin"]
                                   }
-
+  
                                   items[i].Stan_produktu = {
                                     __cdata: ["Nowy"]
                                   }
-
+  
                                   if (Number(items[i].retailPriceGross[0].replace(/,/g, ".")) === 0) {
                                     items[i].Status = "nie"
                                   } else {
                                     items[i].Status = "tak"
                                   }
-
+  
                                   if (items[i].desc[0].replace(/(?:\\[rn])+/g, "").trim().length === 0) {
                                     items[i].Opis = {
                                       __cdata: []
@@ -206,7 +195,7 @@ mongoClient.connect(url, {}, (error, client) => {
                                     };
                                     delete items[i].desc
                                   }
-
+  
                                   if (items[i].ean[0].replace(/(?:\\[rn])+/g, "").trim().length === 0) {
                                     delete items[i].ean;
                                   } else {
@@ -215,18 +204,18 @@ mongoClient.connect(url, {}, (error, client) => {
                                     }
                                     delete items[i].ean;
                                   }
-
+  
                                   items[i].Nr_katalogowy = {
                                     __cdata: [items[i].id]
                                   }
                                   delete items[i].id;
-
+  
                                   if (items[i].photos[0].length === 47) {
                                     delete items[i].photos
                                   } else {
                                     let photosArray = items[i].photos[0].photo
                                     let morePhotos = []
-
+  
                                     if (photosArray.length === 1) {
                                       items[i].Zdjecie_glowne = photosArray[0]._.replace(/(?:\\[rn])+/g, "").trim();
                                       items[i].Zdjecie_glowne_opis = items[i].name[0].replace(/&/g, "AND").replace(/(?:\\[rn])+/g, "").trim();
@@ -238,29 +227,29 @@ mongoClient.connect(url, {}, (error, client) => {
                                       for (let k = 1; k < photosArray.length; k++) {
                                         morePhotos.push(photosArray[k]._.replace(/(?:\\[rn])+/g, "").trim())
                                       }
-
+  
                                       let Zdjecie = []
                                       for (let i = 0; i < morePhotos.length; i++) {
                                         Zdjecie.push({ Zdjecie: { Zdjecie_link: morePhotos[i] } })
                                       }
-
+  
                                       items[i].Zdjecia_dodatkowe = Zdjecie
                                       delete items[i].photos
                                     }
                                   }
-
+  
                                   items[i].Cena_brutto = items[i]['retailPriceGross'][0].replace(/,/g, ".");
                                   items[i].Cena_brutto = Number(items[i].Cena_brutto).toFixed(2);
                                   delete items[i]['retailPriceGross']
-
+  
                                   items[i].Ilosc_produktow = items[i].qty[0].replace(/,/g, ".");
                                   items[i].Ilosc_produktow = Number(items[i].Ilosc_produktow).toFixed(2);
                                   delete items[i].qty;
-
+  
                                   items[i].Dostepnosc = {
                                     __cdata: []
                                   }
-
+  
                                   if (Number(items[i].Ilosc_produktow) === 0) {
                                     items[i].Dostepnosc.__cdata[0] = "Wyprzedane"
                                   } else if (Number(items[i].Ilosc_produktow) > 0 && Number(items[i].Ilosc_produktow) < 6) {
@@ -268,9 +257,9 @@ mongoClient.connect(url, {}, (error, client) => {
                                   } else if (Number(items[i].Ilosc_produktow) > 5) {
                                     items[i].Dostepnosc.__cdata[0] = "Dostępny"
                                   }
-
+  
                                   if (items[i].categories[0].category === undefined) {
-
+  
                                     items[i].Kategoria = {
                                       __cdata: ["OSTATNIO DODANE/NIESKLASYFIKOWANE"]
                                     };
@@ -281,36 +270,36 @@ mongoClient.connect(url, {}, (error, client) => {
                                     };
                                     delete items[i].categories
                                   }
-
+  
                                   if (items[i].weight[0] === "") {
                                     delete items[i].weight;
                                   } else {
                                     items[i].Waga = items[i].weight[0];
                                     delete items[i].weight;
                                   }
-
+  
                                   items[i].Jednostka_miary = {
                                     __cdata: [items[i].unit[0].replace(/(?:\\[rn])+/g, "").trim()]
                                   }
                                   delete items[i].unit;
-
+  
                                   items[i].Nazwa_produktu = {
                                     __cdata: [items[i].name[0].replace(/&/g, "AND").replace(/(?:\\[rn])+/g, "").trim()]
                                   }
                                   delete items[i].name;
-
+  
                                   items[i].Meta_tytul = {
                                     __cdata: [items[i].Nazwa_produktu.__cdata[0]]
                                   }
-
+  
                                   items[i].Meta_opis = {
                                     __cdata: [items[i].Nazwa_produktu.__cdata[0]]
                                   }
-
+  
                                   items[i].Opis_krotki = {
                                     __cdata: [items[i].Nazwa_produktu.__cdata[0]]
                                   }
-
+  
                                   if (items[i].Producent.__cdata[0] === undefined) {
                                     items[i].Meta_slowa = {
                                       __cdata: ["akcesoria rowerowe, części rowerowe, ubrania rowerowe, sklep rowerowy, rowery akcesoria, rowery"]
@@ -320,7 +309,7 @@ mongoClient.connect(url, {}, (error, client) => {
                                       __cdata: [`${items[i].Producent.__cdata[0]}, akcesoria rowerowe, części rowerowe, ubrania rowerowe, sklep rowerowy, rowery akcesoria`]
                                     }
                                   }
-
+  
                                   //--------------------------------------------------------------------------------------------//
                                   /*
                                   Linijka kodu poniżej służy do usuwania kategorii. Odkomentowywać ją tylko jeśli potrzebny jest plik
@@ -328,23 +317,23 @@ mongoClient.connect(url, {}, (error, client) => {
                                   */
                                   //delete items[i].Kategoria
                                   //--------------------------------------------------------------------------------------------//
-
+  
                                   names.push(items[i].Nazwa_produktu.__cdata[0]);
                                   urls.push(items[i].Zdjecie_glowne);
-
+  
                                   for (let k = 0; k < urls.length; k++) {
                                     if (i === k) {
                                       items[i].Opis.__cdata.unshift(`<a href="/images/${urls[k] !== undefined ? urls[k].slice(21) : ""}" target="_blank"><img alt="alt" src="/images/${urls[k] !== undefined ? urls[k].slice(21) : ""}" width = "300px" /></a > <br />`)
                                     }
                                   }
-
-
+  
+  
                                   for (let k = 0; k < names.length; k++) {
                                     if (i === k) {
                                       items[i].Opis.__cdata.unshift(`<b>${names[i]}</b><br />`)
                                     }
                                   }
-
+  
                                   let desc1 = items[i].Opis.__cdata[0];
                                   let desc2 = items[i].Opis.__cdata[1];
                                   let desc3 = items[i].Opis.__cdata[2];
@@ -353,7 +342,7 @@ mongoClient.connect(url, {}, (error, client) => {
                                   } else {
                                     desc3 = items[i].Opis.__cdata[2];
                                   }
-
+  
                                   let descResult = ""
                                   descResult = desc1.concat(desc2, desc3)
                                   items[i].Opis = {
@@ -361,20 +350,20 @@ mongoClient.connect(url, {}, (error, client) => {
                                   };
                                   console.log(`Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`)
                                 }
-
+  
                                 let finalData = {};
                                 finalData.Produkty = []
-
+  
                                 for (let i = 0; i < items.length; i++) {
                                   finalData.Produkty.push({ Produkt: items[i] })
                                 }
                                 const xmlVersion = `<?xml version="1.0" encoding="UTF-8"?>`
                                 const xml = toXML(finalData).replace(/<__cdata>/g, "<![CDATA[").replace(/<(\/)?__cdata[^>]*>/g, ']]>');
-
+  
                                 const finalXML = xmlVersion.concat(xml);
                                 let today = new Date();
                                 let time = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '-' + today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
-
+  
                                 fs.writeFile(`./client/src/ampOutputFiles/ampproducts-${time}-userid-${userId}.xml`, finalXML, (err) => {
                                   if (err) {
                                     console.log("Nie udało się zapisać pliku", err)
@@ -400,7 +389,7 @@ mongoClient.connect(url, {}, (error, client) => {
                 }
               })
             }
-
+  
             if (data.action === "getAMPUpdateFile") {
               db.collection('ampPolska').find({
                 userID: result[0]._id
@@ -418,7 +407,7 @@ mongoClient.connect(url, {}, (error, client) => {
                       //const url = process.env.AMP_UPDATE_API_URL
                       const url = result[0].qtyApi;
                       const userId = result[0].userID;
-
+  
                       console.log('Connecting …')
                       const { data, headers } = await axios({
                         url,
@@ -426,7 +415,7 @@ mongoClient.connect(url, {}, (error, client) => {
                         responseType: 'stream'
                       })
                       const totalLength = headers['content-length']
-
+  
                       console.log('Starting download')
                       const progressBar = new ProgressBar('-> downloading [:bar] :percent :etas', {
                         width: 40,
@@ -435,11 +424,11 @@ mongoClient.connect(url, {}, (error, client) => {
                         renderThrottle: 1,
                         total: parseInt(totalLength)
                       })
-
+  
                       const writer = fs.createWriteStream(
                         path.resolve(__dirname, 'input', 'ampupdate.xml')
                       )
-
+  
                       data.on('data', (chunk) => progressBar.tick(chunk.length))
                       data.pipe(writer)
                       data.on('end', function () {
@@ -457,7 +446,7 @@ mongoClient.connect(url, {}, (error, client) => {
                                   delete items[i]['availability'];
                                   delete items[i]['inStock'];
                                   delete items[i]['sku'];
-
+  
                                   if (items[i].ean[0].replace(/(?:\\[rn])+/g, "").trim().length === 0) {
                                     delete items[i].ean;
                                   } else {
@@ -466,20 +455,20 @@ mongoClient.connect(url, {}, (error, client) => {
                                     }
                                     delete items[i].ean;
                                   }
-
+  
                                   items[i].Nr_katalogowy = {
                                     __cdata: [items[i].id]
                                   }
                                   delete items[i].id;
-
+  
                                   items[i].Ilosc_produktow = items[i].qty[0].replace(/,/g, ".");
                                   items[i].Ilosc_produktow = Number(items[i].Ilosc_produktow).toFixed(2);
                                   delete items[i].qty;
-
+  
                                   items[i].Dostepnosc = {
                                     __cdata: []
                                   }
-
+  
                                   if (Number(items[i].Ilosc_produktow) === 0) {
                                     items[i].Dostepnosc.__cdata[0] = "Wyprzedane"
                                   } else if (Number(items[i].Ilosc_produktow) > 0 && Number(items[i].Ilosc_produktow) < 6) {
@@ -489,20 +478,20 @@ mongoClient.connect(url, {}, (error, client) => {
                                   }
                                   console.log(`Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`)
                                 }
-
+  
                                 let finalData = {};
                                 finalData.Produkty = []
-
+  
                                 for (let i = 0; i < items.length; i++) {
                                   finalData.Produkty.push({ Produkt: items[i] })
                                 }
                                 const xmlVersion = `<?xml version="1.0" encoding="UTF-8"?>`
                                 const xml = toXML(finalData).replace(/<__cdata>/g, "<![CDATA[").replace(/<(\/)?__cdata[^>]*>/g, ']]>');
-
+  
                                 const finalXML = xmlVersion.concat(xml);
                                 let today = new Date();
                                 let time = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '-' + today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
-
+  
                                 fs.writeFile(`./client/src/ampOutputFiles/ampupdate-${time}-userid-${userId}.xml`, finalXML, (err) => {
                                   if (err) {
                                     console.log("Nie udało się zapisać pliku", err)
@@ -528,7 +517,7 @@ mongoClient.connect(url, {}, (error, client) => {
                 }
               })
             }
-
+  
             if (data.action === "getAMPPricesFile") {
               db.collection('ampPolska').find({
                 userID: result[0]._id
@@ -546,7 +535,7 @@ mongoClient.connect(url, {}, (error, client) => {
                       //const url = process.env.AMP_PRODUCTS_API_URL
                       const url = result[0].productsApi;
                       const userId = result[0].userID;
-
+  
                       console.log('Connecting …')
                       const { data, headers } = await axios({
                         url,
@@ -554,7 +543,7 @@ mongoClient.connect(url, {}, (error, client) => {
                         responseType: 'stream'
                       })
                       const totalLength = headers['content-length']
-
+  
                       console.log('Starting download')
                       const progressBar = new ProgressBar('-> downloading [:bar] :percent :etas', {
                         width: 40,
@@ -563,11 +552,11 @@ mongoClient.connect(url, {}, (error, client) => {
                         renderThrottle: 1,
                         total: parseInt(totalLength)
                       })
-
+  
                       const writer = fs.createWriteStream(
                         path.resolve(__dirname, 'input', 'ampproducts.xml')
                       )
-
+  
                       data.on('data', (chunk) => progressBar.tick(chunk.length))
                       data.pipe(writer)
                       data.on('end', function () {
@@ -583,34 +572,34 @@ mongoClient.connect(url, {}, (error, client) => {
                                 let items = result.products.product//.slice(2038, 2040);
                                 let names = [];
                                 let urls = [];
-
+  
                                 for (let i = 0; i < items.length; i++) {
                                   delete items[i].sku;
-
+  
                                   delete items[i].url;
-
+  
                                   delete items[i].attributes;
-
+  
                                   delete items[i].PKWiU;
-
+  
                                   delete items[i].inStock;
-
+  
                                   delete items[i].availability;
-
+  
                                   delete items[i].requiredBox;
-
+  
                                   delete items[i].quantityPerBox;
-
+  
                                   delete items[i].priceAfterDiscountNet;
-
+  
                                   delete items[i].vat;
-
+  
                                   delete items[i].model;
-
+  
                                   delete items[i].brand
-
+  
                                   delete items[i].desc
-
+  
                                   if (items[i].ean[0].replace(/(?:\\[rn])+/g, "").trim().length === 0) {
                                     delete items[i].ean;
                                   } else {
@@ -619,49 +608,49 @@ mongoClient.connect(url, {}, (error, client) => {
                                     }
                                     delete items[i].ean;
                                   }
-
+  
                                   items[i].Nr_katalogowy = {
                                     __cdata: [items[i].id]
                                   }
                                   delete items[i].id;
-
+  
                                   delete items[i].photos;
-
+  
                                   items[i].Promocja = "tak";
-
+  
                                   items[i].Cena_brutto = items[i]['retailPriceGross'][0].replace(/,/g, ".");
                                   items[i].Cena_brutto = (Number(items[i].Cena_brutto) * 0.85).toFixed(2);
-
+  
                                   items[i].Cena_poprzednia = items[i]['retailPriceGross'][0].replace(/,/g, ".");
                                   items[i].Cena_poprzednia = Number(items[i].Cena_poprzednia).toFixed(2);
                                   delete items[i]['retailPriceGross']
-
+  
                                   delete items[i].qty;
-
+  
                                   delete items[i].categories
-
+  
                                   delete items[i].weight;
-
+  
                                   delete items[i].unit;
-
+  
                                   delete items[i].name;
-
+  
                                   console.log(`Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`)
                                 }
-
+  
                                 let finalData = {};
                                 finalData.Produkty = []
-
+  
                                 for (let i = 0; i < items.length; i++) {
                                   finalData.Produkty.push({ Produkt: items[i] })
                                 }
                                 const xmlVersion = `<?xml version="1.0" encoding="UTF-8"?>`
                                 const xml = toXML(finalData).replace(/<__cdata>/g, "<![CDATA[").replace(/<(\/)?__cdata[^>]*>/g, ']]>');
-
+  
                                 const finalXML = xmlVersion.concat(xml);
                                 let today = new Date();
                                 let time = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '-' + today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
-
+  
                                 fs.writeFile(`./client/src/ampOutputFiles/ampprices-${time}-userid-${userId}.xml`, finalXML, (err) => {
                                   if (err) {
                                     console.log("Nie udało się zapisać pliku", err)
@@ -689,8 +678,8 @@ mongoClient.connect(url, {}, (error, client) => {
             }
           }
         }
-      })
-    })
+      });
+    });
 
     app.use((req, res, next) => {
       res.sendFile(path.join(__dirname, "./client/build", "index.html"));
@@ -698,7 +687,7 @@ mongoClient.connect(url, {}, (error, client) => {
 
     //db.collection('ampFiles').remove()
 
-    db.collection('users').find({}).toArray((error, results) => {
+    db.collection('ampPolska').find({}).toArray((error, results) => {
       if (error) {
         console.log(error)
       } else {
