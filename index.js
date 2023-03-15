@@ -15,6 +15,7 @@ app.use(bodyParser.json({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, "./client/build")));
 
 const addUser = require('./httpRequests/addUser');
+const login = require('./httpRequests/login');
 
 const mongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://127.0.0.1:27017';
@@ -27,29 +28,11 @@ mongoClient.connect(url, {}, (error, client) => {
     const db = client.db(dbname)
 
     app.post('/addUser', (req, res) => {
-      addUser(req, res, db)
+      addUser(req, res, db);
     });
 
     app.post('/login', (req, res) => {
-      const user = req.body;
-
-      db.collection('users').find({
-        email: user.email,
-        password: user.password
-      }).toArray((error, results) => {
-        if (error) {
-          res.send({ isUserExist: "error", info: "Nie udało się pobrać informacji o takim użytkowniku" })
-          console.log("Nie udało się pobrać informacji o takim użytkowniku")
-        } else {
-          if (results.length === 1) {
-            res.send({ isUserExist: true, info: "Użytkownik zalogowany pomyślnie" })
-            console.log("Użytkownik zalogowany pomyślnie")
-          } else {
-            res.send({ isUserExist: false, info: "Niepoprawny adres email lub hasło" })
-            console.log("Niepoprawny adres email lub hasło")
-          }
-        }
-      })
+      login(req, res, db);
     })
 
     app.post('/users-integrators', (req, res) => {
