@@ -1,7 +1,12 @@
-module.exports = async function () {
+const axios = require('axios');
+const ProgressBar = require('progress');
+const fs = require('fs');
+const path = require('path');
+
+module.exports = async function (urlResult, userIdResult, xmlIntegrator) {
     //const url = process.env.AMP_PRODUCTS_API_URL
-    const url = result[0].productsApi;
-    const userId = result[0].userID;
+    const url = urlResult;
+    const userId = userIdResult;
 
     console.log('Connecting …')
     const { data, headers } = await axios({
@@ -21,10 +26,10 @@ module.exports = async function () {
     })
 
     const writer = fs.createWriteStream(
-      path.resolve(__dirname, 'input', 'ampproducts.xml')
+      path.resolve(__dirname, '../input', 'ampproducts.xml')
     )
 
     data.on('data', (chunk) => progressBar.tick(chunk.length))
     data.pipe(writer)
-    data.on('end', callback);
+    data.on('end', () => xmlIntegrator(userId));
 };
