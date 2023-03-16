@@ -54,8 +54,7 @@ mongoClient.connect(url, {}, (error, client) => {
           if (result.length === 1) {  
             if (data.action === "addAmpApi") {
               addAmpApi(req, res, db, data, result);
-            };
-  
+            }; 
             if (data.action === "getAmpApi") {
               getAmpApi(res, db, result);
             };

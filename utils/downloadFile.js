@@ -1,0 +1,30 @@
+module.exports = async function () {
+    //const url = process.env.AMP_PRODUCTS_API_URL
+    const url = result[0].productsApi;
+    const userId = result[0].userID;
+
+    console.log('Connecting …')
+    const { data, headers } = await axios({
+      url,
+      method: 'GET',
+      responseType: 'stream'
+    })
+    const totalLength = headers['content-length']
+
+    console.log('Starting download')
+    const progressBar = new ProgressBar('-> downloading [:bar] :percent :etas', {
+      width: 40,
+      complete: '=',
+      incomplete: ' ',
+      renderThrottle: 1,
+      total: parseInt(totalLength)
+    })
+
+    const writer = fs.createWriteStream(
+      path.resolve(__dirname, 'input', 'ampproducts.xml')
+    )
+
+    data.on('data', (chunk) => progressBar.tick(chunk.length))
+    data.pipe(writer)
+    data.on('end', callback);
+};
