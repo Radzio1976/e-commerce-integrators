@@ -65,6 +65,26 @@ app.post("/users-integrators", (req, res) => {
   usersIntegrators(req, res, usersdb, ampPolska, fhSahs);
 });
 
+app.post("/shopGold-ampPolska", (req, res) => {
+  const data = req.body;
+  usersdb
+    .find({
+      email: data.currentUser,
+    })
+    .toArray((error, result) => {
+      if (error) {
+        res.send("Nie udało się znależć użytkownika");
+        console.log("Nie udało się znależć użytkownika", error);
+      } else {
+        if (result.length === 1) {
+          if (data.action === "addAmpApi") {
+            addAmpApi(req, res, ampPolska, data, result);
+          }
+        }
+      }
+    });
+});
+
 app.listen(port, () =>
   console.log(`Serwer nasłuchuje na porcie: http://localhost:${port}`)
 );
