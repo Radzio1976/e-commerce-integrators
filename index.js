@@ -80,6 +80,9 @@ app.post("/shopGold-ampPolska", (req, res) => {
           if (data.action === "addAmpApi") {
             addAmpApi(req, res, ampPolska, data, result);
           }
+          if (data.action === "getAmpApi") {
+            getAmpApi(res, ampPolska, result);
+          }
         }
       }
     });
