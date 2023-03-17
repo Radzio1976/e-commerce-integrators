@@ -1,402 +1,60 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-var parseString = require('xml2js').parseString;
-const { toXML } = require('jstoxml');
-require('dotenv').config();
-const axios = require('axios');
-var cors = require('cors');
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
+var parseString = require("xml2js").parseString;
+const { toXML } = require("jstoxml");
+require("dotenv").config();
+const axios = require("axios");
+var cors = require("cors");
 const bodyParser = require("body-parser");
-const ProgressBar = require('progress');
-const port = process.env.PORT || 8080;
+const ProgressBar = require("progress");
+const { MongoClient } = require("mongodb");
+const port = process.env.PORT || 3001;
+const uri = process.env.MONGODB_URI;
+
+const addUser = require("./httpRequests/addUser");
+const login = require("./httpRequests/login");
+const usersIntegrators = require("./httpRequests/usersIntegrators");
+const addAmpApi = require("./httpRequests/addAmpApi");
+const getAmpApi = require("./httpRequests/getAmpApi");
+const downloadFile = require("./utils/downloadFile");
+const shopGoldAmpPolskaProducts = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaProducts");
+
 const app = express();
 app.use(cors());
-app.use(bodyParser.json({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: "50mb", extended: true }));
 app.use(express.static(path.join(__dirname, "./client/build")));
 
-const addUser = require('./httpRequests/addUser');
-const login = require('./httpRequests/login');
-const usersIntegrators = require('./httpRequests/usersIntegrators');
-const addAmpApi = require('./httpRequests/addAmpApi');
-const getAmpApi = require('./httpRequests/getAmpApi');
-const downloadFile = require('./utils/downloadFile');
-const shopGoldAmpPolskaProducts = require('./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaProducts');
-
-const mongoClient = require('mongodb').MongoClient;
-const url = 'mongodb://127.0.0.1:27017';
-const dbname = 'e-commerce-integrators';
-
-mongoClient.connect(url, {}, (error, client) => {
-  if (error) {
-    console.log("Nie można połączyć się z bazą danych")
-  } else {
-    const db = client.db(dbname)
-
-    app.post('/addUser', (req, res) => {
-      addUser(req, res, db);
-    });
-
-    app.post('/login', (req, res) => {
-      login(req, res, db);
-    })
-
-    app.post('/users-integrators', (req, res) => {
-      usersIntegrators(req, res, db);
-    })
-
-    app.post('/shopGold-ampPolska', (req, res) => {
-      const data = req.body;
-      db.collection('users').find({
-        email: data.currentUser
-      }).toArray((error, result) => {
-        if (error) {
-          res.send("Nie udało się znależć użytkownika")
-          console.log("Nie udało się znależć użytkownika", error)
-        } else {
-          if (result.length === 1) {  
-            if (data.action === "addAmpApi") {
-              addAmpApi(req, res, db, data, result);
-            }; 
-            if (data.action === "getAmpApi") {
-              getAmpApi(res, db, result);
-            };
-  
-            if (data.action === "getAMPProductsFile") {
-              db.collection('ampPolska').find({
-                userID: result[0]._id
-              }).toArray((error, result) => {
-                if (error) {
-                  res.send("Nie udało się pobrać informacji z bazy danych")
-                  console.log("Nie udało się pobrać informacji z bazy danych", error)
-                } else {
-                  if (result.length === 0) {
-                    res.send("Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska")
-                    console.log("Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska")
-                  }
-                  if (result.length === 1) {
-                    const urlResult = result[0].productsApi;
-                    const userIdResult = result[0].userID;
-                    downloadFile(urlResult, userIdResult, shopGoldAmpPolskaProducts);                    
-                  }
-                }
-              })
-            }
-  
-            if (data.action === "getAMPUpdateFile") {
-              db.collection('ampPolska').find({
-                userID: result[0]._id
-              }).toArray((error, result) => {
-                if (error) {
-                  res.send("Nie udało się pobrać informacji z bazy danych")
-                  console.log("Nie udało się pobrać informacji z bazy danych", error)
-                } else {
-                  if (result.length === 0) {
-                    res.send("Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska")
-                    console.log("Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska")
-                  }
-                  if (result.length === 1) {
-                    async function downloadAMPUpdateFile() {
-                      //const url = process.env.AMP_UPDATE_API_URL
-                      const url = result[0].qtyApi;
-                      const userId = result[0].userID;
-  
-                      console.log('Connecting …')
-                      const { data, headers } = await axios({
-                        url,
-                        method: 'GET',
-                        responseType: 'stream'
-                      })
-                      const totalLength = headers['content-length']
-  
-                      console.log('Starting download')
-                      const progressBar = new ProgressBar('-> downloading [:bar] :percent :etas', {
-                        width: 40,
-                        complete: '=',
-                        incomplete: ' ',
-                        renderThrottle: 1,
-                        total: parseInt(totalLength)
-                      })
-  
-                      const writer = fs.createWriteStream(
-                        path.resolve(__dirname, 'input', 'ampupdate.xml')
-                      )
-  
-                      data.on('data', (chunk) => progressBar.tick(chunk.length))
-                      data.pipe(writer)
-                      data.on('end', function () {
-                        fs.readFile('./input/ampupdate.xml', 'utf8', (err, data) => {
-                          if (err) {
-                            console.log("Coś poszło nie tak", err)
-                          } else {
-                            const xml = data;
-                            parseString(xml, (err, result) => {
-                              if (err) {
-                                return console.log("Nieprawidłowe dane", err)
-                              } else {
-                                let items = result.products.product
-                                for (let i = 0; i < items.length; i++) {
-                                  delete items[i]['availability'];
-                                  delete items[i]['inStock'];
-                                  delete items[i]['sku'];
-  
-                                  if (items[i].ean[0].replace(/(?:\\[rn])+/g, "").trim().length === 0) {
-                                    delete items[i].ean;
-                                  } else {
-                                    items[i].Kod_ean = {
-                                      __cdata: [items[i].ean[0].replace(/(?:\\[rn])+/g, "").trim()]
-                                    }
-                                    delete items[i].ean;
-                                  }
-  
-                                  items[i].Nr_katalogowy = {
-                                    __cdata: [items[i].id]
-                                  }
-                                  delete items[i].id;
-  
-                                  items[i].Ilosc_produktow = items[i].qty[0].replace(/,/g, ".");
-                                  items[i].Ilosc_produktow = Number(items[i].Ilosc_produktow).toFixed(2);
-                                  delete items[i].qty;
-  
-                                  items[i].Dostepnosc = {
-                                    __cdata: []
-                                  }
-  
-                                  if (Number(items[i].Ilosc_produktow) === 0) {
-                                    items[i].Dostepnosc.__cdata[0] = "Wyprzedane"
-                                  } else if (Number(items[i].Ilosc_produktow) > 0 && Number(items[i].Ilosc_produktow) < 6) {
-                                    items[i].Dostepnosc.__cdata[0] = "Na wyczerpaniu"
-                                  } else if (Number(items[i].Ilosc_produktow) > 5) {
-                                    items[i].Dostepnosc.__cdata[0] = "Dostępny"
-                                  }
-                                  console.log(`Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`)
-                                }
-  
-                                let finalData = {};
-                                finalData.Produkty = []
-  
-                                for (let i = 0; i < items.length; i++) {
-                                  finalData.Produkty.push({ Produkt: items[i] })
-                                }
-                                const xmlVersion = `<?xml version="1.0" encoding="UTF-8"?>`
-                                const xml = toXML(finalData).replace(/<__cdata>/g, "<![CDATA[").replace(/<(\/)?__cdata[^>]*>/g, ']]>');
-  
-                                const finalXML = xmlVersion.concat(xml);
-                                let today = new Date();
-                                let time = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '-' + today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
-  
-                                fs.writeFile(`./client/src/ampOutputFiles/ampupdate-${time}-userid-${userId}.xml`, finalXML, (err) => {
-                                  if (err) {
-                                    console.log("Nie udało się zapisać pliku", err)
-                                  } else {
-                                    console.log('Plik został zapisany :)');
-                                    fs.readdir('./client/src/ampOutputFiles', (err, files) => {
-                                      if (err)
-                                        console.log(err);
-                                      else {
-                                        console.log(files)
-                                      }
-                                    })
-                                  }
-                                });
-                              }
-                            })
-                          }
-                        })
-                      })
-                    }
-                    downloadAMPUpdateFile()
-                  }
-                }
-              })
-            }
-  
-            if (data.action === "getAMPPricesFile") {
-              db.collection('ampPolska').find({
-                userID: result[0]._id
-              }).toArray((error, result) => {
-                if (error) {
-                  res.send("Nie udało się pobrać informacji z bazy danych")
-                  console.log("Nie udało się pobrać informacji z bazy danych", error)
-                } else {
-                  if (result.length === 0) {
-                    res.send("Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska")
-                    console.log("Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska")
-                  }
-                  if (result.length === 1) {
-                    async function downloadAMPPricesFile() {
-                      //const url = process.env.AMP_PRODUCTS_API_URL
-                      const url = result[0].productsApi;
-                      const userId = result[0].userID;
-  
-                      console.log('Connecting …')
-                      const { data, headers } = await axios({
-                        url,
-                        method: 'GET',
-                        responseType: 'stream'
-                      })
-                      const totalLength = headers['content-length']
-  
-                      console.log('Starting download')
-                      const progressBar = new ProgressBar('-> downloading [:bar] :percent :etas', {
-                        width: 40,
-                        complete: '=',
-                        incomplete: ' ',
-                        renderThrottle: 1,
-                        total: parseInt(totalLength)
-                      })
-  
-                      const writer = fs.createWriteStream(
-                        path.resolve(__dirname, 'input', 'ampproducts.xml')
-                      )
-  
-                      data.on('data', (chunk) => progressBar.tick(chunk.length))
-                      data.pipe(writer)
-                      data.on('end', function () {
-                        fs.readFile('./input/ampproducts.xml', 'utf8', (err, data) => {
-                          if (err) {
-                            console.log("Coś poszło nie tak", err)
-                          } else {
-                            const xml = data;
-                            parseString(xml, (err, result) => {
-                              if (err) {
-                                return console.log("Nieprawidłowe dane", err)
-                              } else {
-                                let items = result.products.product//.slice(2038, 2040);
-                                let names = [];
-                                let urls = [];
-  
-                                for (let i = 0; i < items.length; i++) {
-                                  delete items[i].sku;
-  
-                                  delete items[i].url;
-  
-                                  delete items[i].attributes;
-  
-                                  delete items[i].PKWiU;
-  
-                                  delete items[i].inStock;
-  
-                                  delete items[i].availability;
-  
-                                  delete items[i].requiredBox;
-  
-                                  delete items[i].quantityPerBox;
-  
-                                  delete items[i].priceAfterDiscountNet;
-  
-                                  delete items[i].vat;
-  
-                                  delete items[i].model;
-  
-                                  delete items[i].brand
-  
-                                  delete items[i].desc
-  
-                                  if (items[i].ean[0].replace(/(?:\\[rn])+/g, "").trim().length === 0) {
-                                    delete items[i].ean;
-                                  } else {
-                                    items[i].Kod_ean = {
-                                      __cdata: [items[i].ean[0].replace(/(?:\\[rn])+/g, "").trim()]
-                                    }
-                                    delete items[i].ean;
-                                  }
-  
-                                  items[i].Nr_katalogowy = {
-                                    __cdata: [items[i].id]
-                                  }
-                                  delete items[i].id;
-  
-                                  delete items[i].photos;
-  
-                                  items[i].Promocja = "tak";
-  
-                                  items[i].Cena_brutto = items[i]['retailPriceGross'][0].replace(/,/g, ".");
-                                  items[i].Cena_brutto = (Number(items[i].Cena_brutto) * 0.85).toFixed(2);
-  
-                                  items[i].Cena_poprzednia = items[i]['retailPriceGross'][0].replace(/,/g, ".");
-                                  items[i].Cena_poprzednia = Number(items[i].Cena_poprzednia).toFixed(2);
-                                  delete items[i]['retailPriceGross']
-  
-                                  delete items[i].qty;
-  
-                                  delete items[i].categories
-  
-                                  delete items[i].weight;
-  
-                                  delete items[i].unit;
-  
-                                  delete items[i].name;
-  
-                                  console.log(`Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`)
-                                }
-  
-                                let finalData = {};
-                                finalData.Produkty = []
-  
-                                for (let i = 0; i < items.length; i++) {
-                                  finalData.Produkty.push({ Produkt: items[i] })
-                                }
-                                const xmlVersion = `<?xml version="1.0" encoding="UTF-8"?>`
-                                const xml = toXML(finalData).replace(/<__cdata>/g, "<![CDATA[").replace(/<(\/)?__cdata[^>]*>/g, ']]>');
-  
-                                const finalXML = xmlVersion.concat(xml);
-                                let today = new Date();
-                                let time = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + '-' + today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
-  
-                                fs.writeFile(`./client/src/ampOutputFiles/ampprices-${time}-userid-${userId}.xml`, finalXML, (err) => {
-                                  if (err) {
-                                    console.log("Nie udało się zapisać pliku", err)
-                                  } else {
-                                    console.log('Plik został zapisany :)');
-                                    fs.readdir('./client/src/ampOutputFiles', (err, files) => {
-                                      if (err)
-                                        console.log(err);
-                                      else {
-                                        console.log(files)
-                                      }
-                                    })
-                                  }
-                                });
-                              }
-                            })
-                          }
-                        })
-                      })
-                    }
-                    downloadAMPPricesFile()
-                  }
-                }
-              })
-            }
-          }
-        }
-      });
-    });
-
-    app.use((req, res, next) => {
-      res.sendFile(path.join(__dirname, "./client/build", "index.html"));
-    });
-
-    //db.collection('ampFiles').remove()
-
-    db.collection('ampPolska').find({}).toArray((error, results) => {
-      if (error) {
-        console.log(error)
-      } else {
-        console.log(results)
+app.get("*", function (_, res) {
+  res.sendFile(
+    path.join(__dirname, "./client/build", "index.html"),
+    function (err) {
+      if (err) {
+        res.status(500), send(err);
       }
-    })
+    }
+  );
+});
 
+const client = new MongoClient(uri);
 
-
-
-
-
-    console.log("Database connection is OK")
+async function mongoDBConnection() {
+  try {
+    //Connect to the MongoDB cluster
+    client.connect();
+    console.log("Connected with MongoDB");
+  } catch (error) {
+    console.log("Not connected with MongoDB", error);
   }
-})
+}
+mongoDBConnection();
 
-app.listen(port, '127.0.0.1', () => console.log(`Serwer nasłuchuje na porcie: http://localhost:${port}`));
+const usersdb = client.db("e-commerce-integrators").collection("users");
 
+app.post("/addUser", (req, res) => {
+  addUser(req, res, usersdb);
+});
 
-                    
+app.listen(port, () =>
+  console.log(`Serwer nasłuchuje na porcie: http://localhost:${port}`)
+);
