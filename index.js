@@ -50,6 +50,8 @@ async function mongoDBConnection() {
 mongoDBConnection();
 
 const usersdb = client.db("e-commerce-integrators").collection("users");
+const ampPolska = client.db("e-commerce-integrators").collection("ampPolska");
+const fhSahs = client.db("e-commerce-integrators").collection("fhSahs");
 
 app.post("/addUser", (req, res) => {
   addUser(req, res, usersdb);
@@ -57,6 +59,10 @@ app.post("/addUser", (req, res) => {
 
 app.post("/login", (req, res) => {
   login(req, res, usersdb);
+});
+
+app.post("/users-integrators", (req, res) => {
+  usersIntegrators(req, res, usersdb, ampPolska, fhSahs);
 });
 
 app.listen(port, () =>
