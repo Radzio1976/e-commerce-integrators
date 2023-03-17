@@ -55,6 +55,10 @@ app.post("/addUser", (req, res) => {
   addUser(req, res, usersdb);
 });
 
+app.post("/login", (req, res) => {
+  login(req, res, usersdb);
+});
+
 app.listen(port, () =>
   console.log(`Serwer nasłuchuje na porcie: http://localhost:${port}`)
 );
