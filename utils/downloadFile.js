@@ -3,7 +3,12 @@ const ProgressBar = require("progress");
 const fs = require("fs");
 const path = require("path");
 
-module.exports = async function (urlResult, userIdResult, xmlIntegrator) {
+module.exports = async function (
+  urlResult,
+  userIdResult,
+  xmlIntegrator,
+  inputFileName
+) {
   const url = urlResult;
   const userId = userIdResult;
 
@@ -13,24 +18,21 @@ module.exports = async function (urlResult, userIdResult, xmlIntegrator) {
     method: "GET",
     responseType: "stream",
   });
-  const totalLength = headers["content-length"];
+  console.log("Zaczynam pobieranie pliku");
 
-  console.log("Starting download");
-  const progressBar = new ProgressBar("-> downloading [:bar] :percent :etas", {
-    width: 40,
-    complete: "=",
-    incomplete: " ",
-    renderThrottle: 1,
-    total: parseInt(totalLength),
-  });
+  let word = "Poczekaj chwilę ";
+  let interval = setInterval(() => {
+    word += ".";
+    console.log(word);
+  }, 500);
 
   const writer = fs.createWriteStream(
-    path.resolve(__dirname, "../input", "ampproducts.xml")
+    path.resolve(__dirname, "../input", inputFileName)
   );
 
-  data.on("data", (chunk) => {
-    progressBar.tick(chunk.length);
-  });
   data.pipe(writer);
-  data.on("end", () => xmlIntegrator(userId));
+  data.on("end", () => {
+    clearInterval(interval);
+    xmlIntegrator(userId);
+  });
 };

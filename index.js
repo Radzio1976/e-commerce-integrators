@@ -19,6 +19,7 @@ const addAmpApi = require("./httpRequests/addAmpApi");
 const getAmpApi = require("./httpRequests/getAmpApi");
 const downloadFile = require("./utils/downloadFile");
 const shopGoldAmpPolskaProducts = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaProducts");
+const shopGoldAmpPolskaUpdate = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaUpdate");
 
 const app = express();
 app.use(cors());
@@ -107,10 +108,46 @@ app.post("/shopGold-ampPolska", (req, res) => {
                   if (result.length === 1) {
                     const urlResult = result[0].productsApi;
                     const userIdResult = result[0].userID;
+                    const inputFileName = "ampproducts.xml";
                     downloadFile(
                       urlResult,
                       userIdResult,
-                      shopGoldAmpPolskaProducts
+                      shopGoldAmpPolskaProducts,
+                      inputFileName
+                    );
+                  }
+                }
+              });
+          }
+
+          if (data.action === "getAMPUpdateFile") {
+            ampPolska
+              .find({ userID: result[0]._id })
+              .toArray((error, result) => {
+                if (error) {
+                  res.send("Nie udało się pobrać informacji z bazy danych");
+                  console.log(
+                    "Nie udało się pobrać informacji z bazy danych",
+                    error
+                  );
+                } else {
+                  if (result.length === 0) {
+                    res.send(
+                      "Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska"
+                    );
+                    console.log(
+                      "Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska"
+                    );
+                  }
+                  if (result.length === 1) {
+                    const urlResult = result[0].qtyApi;
+                    const userIdResult = result[0].userID;
+                    const inputFileName = "ampupdate.xml";
+                    downloadFile(
+                      urlResult,
+                      userIdResult,
+                      shopGoldAmpPolskaUpdate,
+                      inputFileName
                     );
                   }
                 }
