@@ -3,10 +3,10 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Home from "./components/Home";
 import AddUser from "./components/AddUser";
-//import Login from "./components/Login";
+import Login from "./components/Login";
 import Nav from "./components/Nav";
 import Admin from "./components/Admin";
-//import ShopGoldAmp from "./components/ShopgoldAmp";
+import ShopGoldAmp from "./components/ShopgoldAmp";
 
 import AppState from "./hooks/AppState";
 
@@ -30,8 +30,9 @@ const App = () => {
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/add-user" element={<AddUser />} />
-
+          <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/ShopGold-AMPPolska" element={<ShopGoldAmp />} />
         </Routes>
       </BrowserRouter>
     </div>

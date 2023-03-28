@@ -1,73 +1,44 @@
-import React from 'react';
-import axios from 'axios';
-import { Redirect } from 'react-router-dom';
-import { AuthContext } from '../../App';
+import React from "react";
+import { Navigate } from "react-router-dom";
 
-class Login extends React.Component {
-  state = {
-    email: "",
-    password: "",
-    loginError: ""
-  }
+import AppState from "../../hooks/AppState";
+import useLoginHook from "../../hooks/useLoginHook";
+import useInputChangeHook from "../../hooks/useInputChangeHook";
 
-  handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value
-    })
-  }
+const Login = () => {
+  const { isAuth, inputValue, loginError } = AppState();
+  const { login, handleSubmit } = useLoginHook();
+  const { handleChange } = useInputChangeHook();
 
-  handleSubmit = (e, login) => {
-    e.preventDefault();
-    const { email, password } = this.state;
-    const user = {
-      email,
-      password
-    }
-    axios.post("/login", user)
-      .then(res => {
-        console.log(res.data)
-        if (res.data.isUserExist === "error") {
-          this.setState({
-            loginError: res.data.info
-          })
-        }
-        if (res.data.isUserExist === false) {
-          this.setState({
-            loginError: res.data.info
-          })
-        }
-        if (res.data.isUserExist === true) {
-          login(email)
-        }
-      })
-  }
-
-  render() {
-    return (
-      <AuthContext.Consumer>
-        {
-          ({ isAuth, login }) => {
-            return (
-              isAuth ?
-                <Redirect to="/" /> :
-                <div id="Login">
-                  <h3>Zaloguj się</h3>
-                  <form onSubmit={(e) => this.handleSubmit(e, login)}>
-                    <label>Email:
-          <input type="text" name="email" value={this.state.email} onChange={this.handleChange}></input></label>
-                    <label>Hasło
-          <input type="password" name="password" value={this.state.password} onChange={this.handleChange}></input></label>
-                    <button>Zaloguj</button>
-                    <p>{this.state.loginError}</p>
-                  </form>
-                </div>
-            )
-          }
-        }
-      </AuthContext.Consumer>
-    )
-
-  }
-}
+  return isAuth ? (
+    <Navigate to="/" />
+  ) : (
+    <div id="Login">
+      <h3>Zaloguj się</h3>
+      <form onSubmit={(e) => handleSubmit(e, login)}>
+        <label>
+          Email:
+          <input
+            type="text"
+            name="email"
+            value={inputValue.email}
+            onChange={(e) => handleChange(e)}
+          ></input>
+        </label>
+        <label>
+          Hasło
+          <input
+            type="password"
+            name="password"
+            value={inputValue.password}
+            onChange={(e) => handleChange(e)}
+          ></input>
+        </label>
+        <button>Zaloguj</button>
+        <p>{loginError}</p>
+      </form>
+    </div>
+  );
+};
 
 export default Login;

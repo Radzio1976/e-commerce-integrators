@@ -9,6 +9,10 @@ const initialState = {
     email: "",
     password: "",
     password2: "",
+    productsApi: "",
+    qtyApi: "",
+    changeProductsApi: "",
+    changeQtyApi: "",
   },
   companyError: "",
   nipError: "",
@@ -17,11 +21,14 @@ const initialState = {
   emailError: "",
   passwordError: "",
   password2Error: "",
+  loginError: "",
   registerError: "",
   registerSuccess: false,
   registerSuccessInfo: "",
   isAuth: false,
   currentUser: "",
+  userId: "",
+  isJoined: false,
   userIntegrators: [],
 };
 
@@ -36,6 +43,7 @@ const AppState = () => {
   const [emailError, setEmailError] = useGlobalState("emailError");
   const [passwordError, setPasswordError] = useGlobalState("passwordError");
   const [password2Error, setPassword2Error] = useGlobalState("password2Error");
+  const [loginError, setLoginError] = useGlobalState("loginError");
   const [registerError, setRegisterError] = useGlobalState("registerError");
   const [registerSuccess, setRegisterSuccess] =
     useGlobalState("registerSuccess");
@@ -44,6 +52,8 @@ const AppState = () => {
   );
   const [isAuth, setIsAuth] = useGlobalState("isAuth");
   const [currentUser, setCurrentUser] = useGlobalState("currentUser");
+  const [userId, setUserId] = useGlobalState("userId");
+  const [isJoined, setIsJoined] = useGlobalState("isJoined");
   const [userIntegrators, setUserIntegrators] =
     useGlobalState("userIntegrators");
 
@@ -64,6 +74,8 @@ const AppState = () => {
     setPasswordError,
     password2Error,
     setPassword2Error,
+    loginError,
+    setLoginError,
     registerError,
     setRegisterError,
     registerSuccess,
@@ -74,6 +86,10 @@ const AppState = () => {
     setIsAuth,
     currentUser,
     setCurrentUser,
+    userId,
+    setUserId,
+    isJoined,
+    setIsJoined,
     userIntegrators,
     setUserIntegrators,
   };
