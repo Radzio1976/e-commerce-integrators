@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createContext } from "react";
 import { BrowserRouter, Switch, Route, Routes } from "react-router-dom";
 import "./App.css";
@@ -9,69 +9,41 @@ import AddUser from "./components/AddUser";
 import Admin from "./components/Admin";
 //import ShopGoldAmp from "./components/ShopgoldAmp";
 
-const AuthContext = createContext();
+import AppState from "./hooks/AppState";
+import useLoginHook from "./hooks/useLoginHook";
 
-class App extends React.Component {
-  state = {
-    isAuth: false,
-    currentUser: "",
-  };
-
-  componentDidMount() {
+const App = () => {
+  const { isAuth, setIsAuth, currentUser, setCurrentUser } = AppState();
+  const { login } = useLoginHook();
+  useEffect(() => {
     if (localStorage.getItem("email") === null) {
-      this.setState({
-        isAuth: false,
-        currentUser: "",
-      });
+      setIsAuth(false);
+      setCurrentUser("");
     } else {
-      this.setState({
-        isAuth: true,
-        currentUser: localStorage.getItem("email"),
-      });
+      setIsAuth(true);
+      setCurrentUser(localStorage.getItem("email"));
     }
-  }
-
-  login = (email) => {
-    localStorage.setItem("email", email);
-    this.setState({
-      isAuth: true,
-      currentUser: email,
-    });
-  };
+  }, []);
 
   logout = () => {
     localStorage.removeItem("email");
-    this.setState({
-      isAuth: false,
-      currentUser: "",
-    });
+    setIsAuth(false);
+    setCurrentUser("");
   };
 
-  render() {
-    return (
-      <div id="App">
-        <AuthContext.Provider
-          value={{
-            login: this.login,
-            logout: this.logout,
-            isAuth: this.state.isAuth,
-            currentUser: this.state.currentUser,
-          }}
-        >
-          <BrowserRouter>
-            <Routes>
-              <Route path="/add-user" element={<AddUser />} />
+  return (
+    <div id="App">
+      <BrowserRouter>
+        <Routes>
+          <Route path="/add-user" element={<AddUser />} />
 
-              <Route path="/admin" element={<Admin />} />
-            </Routes>
-          </BrowserRouter>
-        </AuthContext.Provider>
-      </div>
-    );
-  }
-}
+          <Route path="/admin" element={<Admin />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
+};
 
-export { AuthContext };
 export default App;
 
 /*
