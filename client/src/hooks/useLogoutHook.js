@@ -1,6 +1,6 @@
 import AppState from "./AppState";
 const useLogoutHook = () => {
-  const { isAuth, setIsAuth, currentUser, setCurrentUser } = AppState();
+  const { setIsAuth, setCurrentUser } = AppState();
 
   const logout = () => {
     localStorage.removeItem("email");

@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
-import { createContext } from "react";
-import { BrowserRouter, Switch, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 //import Home from "./components/Home";
 import AddUser from "./components/AddUser";
 //import Login from "./components/Login";
-//import Nav from "./components/Nav";
+import Nav from "./components/Nav";
 import Admin from "./components/Admin";
 //import ShopGoldAmp from "./components/ShopgoldAmp";
 
@@ -27,6 +26,7 @@ const App = () => {
   return (
     <div id="App">
       <BrowserRouter>
+        <Nav />
         <Routes>
           <Route path="/add-user" element={<AddUser />} />
 

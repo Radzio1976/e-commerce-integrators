@@ -1,7 +1,7 @@
 import AppState from "./AppState";
 
 const useLoginHook = () => {
-  const { isAuth, setIsAuth, currentUser, setCurrentUser } = AppState();
+  const { setIsAuth, setCurrentUser } = AppState();
 
   const login = (email) => {
     localStorage.setItem("email", email);

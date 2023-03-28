@@ -1,5 +1,4 @@
 import React from "react";
-import { withRouter } from "react-router-dom";
 import "./AddUser.css";
 
 import AppState from "../../hooks/AppState";
@@ -9,12 +8,9 @@ import useAddUserHook from "../../hooks/useAddUserHook";
 const AddUser = () => {
   const {
     inputValue,
-    companyError,
-    nipError,
     nameError,
     surnameError,
     emailError,
-    passwordError,
     password2Error,
     registerSuccess,
     registerError,
