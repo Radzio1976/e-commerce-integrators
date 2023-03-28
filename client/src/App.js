@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-//import Home from "./components/Home";
+import Home from "./components/Home";
 import AddUser from "./components/AddUser";
 //import Login from "./components/Login";
 import Nav from "./components/Nav";
@@ -28,6 +28,7 @@ const App = () => {
       <BrowserRouter>
         <Nav />
         <Routes>
+          <Route path="/" exact element={<Home />} />
           <Route path="/add-user" element={<AddUser />} />
 
           <Route path="/admin" element={<Admin />} />
