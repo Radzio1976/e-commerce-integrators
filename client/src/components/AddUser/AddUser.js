@@ -28,7 +28,7 @@ const AddUser = () => {
     <div id="AddUser">
       {!registerSuccess ? (
         <div className="add-user-form">
-          <form onSubmit={addUser}>
+          <form onSubmit={(e) => addUser(e)}>
             <label>
               Nazwa firmy:
               <input

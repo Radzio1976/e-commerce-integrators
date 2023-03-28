@@ -10,11 +10,10 @@ import Admin from "./components/Admin";
 //import ShopGoldAmp from "./components/ShopgoldAmp";
 
 import AppState from "./hooks/AppState";
-import useLoginHook from "./hooks/useLoginHook";
 
 const App = () => {
-  const { isAuth, setIsAuth, currentUser, setCurrentUser } = AppState();
-  const { login } = useLoginHook();
+  const { setIsAuth, setCurrentUser } = AppState();
+
   useEffect(() => {
     if (localStorage.getItem("email") === null) {
       setIsAuth(false);
@@ -24,12 +23,6 @@ const App = () => {
       setCurrentUser(localStorage.getItem("email"));
     }
   }, []);
-
-  logout = () => {
-    localStorage.removeItem("email");
-    setIsAuth(false);
-    setCurrentUser("");
-  };
 
   return (
     <div id="App">

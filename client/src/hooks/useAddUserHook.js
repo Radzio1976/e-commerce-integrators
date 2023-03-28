@@ -3,15 +3,18 @@ import Axios from "axios";
 import AppState from "./AppState";
 
 const useAddUserHook = () => {
+  const {
+    inputValue,
+    setNameError,
+    setSurnameError,
+    setEmailError,
+    setPassword2Error,
+    setRegisterError,
+    setRegisterSuccess,
+    setRegisterSuccessInfo,
+  } = AppState();
   const addUser = (e) => {
     e.preventDefault();
-    const {
-      inputValue,
-      setNameError,
-      setSurnameError,
-      setEmailError,
-      setPassword2Error,
-    } = AppState();
     let isValid = true;
     if (inputValue.name.length < 5) {
       setNameError("Pole imię musi mieć conajmniej 5 znaków");
@@ -46,20 +49,14 @@ const useAddUserHook = () => {
         .then((res) => {
           console.log(res.data);
           if (res.data.addUser === "error") {
-            this.setState({
-              registerError: res.data.info,
-            });
+            setRegisterError(res.data.info);
           }
           if (res.data.addUser === false) {
-            this.setState({
-              registerError: res.data.info,
-            });
+            setRegisterError(res.data.info);
           }
           if (res.data.addUser === true) {
-            this.setState({
-              registerSuccess: true,
-              registerSuccessInfo: res.data.info,
-            });
+            setRegisterSuccess(true);
+            setRegisterSuccessInfo(res.data.info);
           }
         })
         .catch((err) => {
