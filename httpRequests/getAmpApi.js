@@ -17,9 +17,11 @@ module.exports = function (res, ampPolska, result) {
           );
         }
         if (result.length === 1) {
+          console.log(res.data);
           res.send({
             productsApi: result[0].productsApi,
             qtyApi: result[0].qtyApi,
+            pricesApi: result[0].pricesApi,
             isJoined: true,
           });
         }

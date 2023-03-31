@@ -2,7 +2,7 @@ import Axios from "axios";
 import AppState from "./AppState";
 
 const useAMPHook = () => {
-  const { currentUser, inputValue } = AppState();
+  const { currentUser, userId, inputValue, setIsJoined } = AppState();
   const addApi = (e) => {
     e.preventDefault();
     const data = {
@@ -10,10 +10,32 @@ const useAMPHook = () => {
       currentUser: currentUser,
       productsApi: inputValue.productsApi,
       qtyApi: inputValue.qtyApi,
+      pricesApi: inputValue.pricesApi,
     };
     Axios.post("/shopgold-amppolska", data)
       .then((res) => {
         console.log(res.data);
+        setIsJoined(res.data.setIsJoined);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const changeApi = (e) => {
+    e.preventDefault();
+    const data = {
+      action: "changeAmpApi",
+      currentUser: currentUser,
+      userId: userId,
+      changeProductsApi: inputValue.changeProductsApi,
+      changeQtyApi: inputValue.changeQtyApi,
+      changePricesApi: inputValue.changePricesApi,
+    };
+    Axios.post("/shopgold-amppolska", data)
+      .then((res) => {
+        console.log(res.data);
+        setIsJoined(res.data.setIsJoined);
       })
       .catch((error) => {
         console.log(error);
@@ -21,7 +43,6 @@ const useAMPHook = () => {
   };
 
   const getAMPProductsFile = () => {
-    console.log("Działa");
     const data = {
       action: "getAMPProductsFile",
       currentUser: currentUser,
@@ -63,7 +84,13 @@ const useAMPHook = () => {
         console.log(error);
       });
   };
-  return { addApi, getAMPProductsFile, getAMPUpdateFile, getAMPPricesFile };
+  return {
+    addApi,
+    changeApi,
+    getAMPProductsFile,
+    getAMPUpdateFile,
+    getAMPPricesFile,
+  };
 };
 
 export default useAMPHook;

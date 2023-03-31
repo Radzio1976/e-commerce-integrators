@@ -3,7 +3,8 @@ import Axios from "axios";
 import AppState from "./AppState";
 
 const useLoginHook = () => {
-  const { inputValue, setLoginError, setIsAuth, setCurrentUser } = AppState();
+  const { inputValue, setLoginError, setIsAuth, setCurrentUser, setUserId } =
+    AppState();
 
   const handleSubmit = (e, login) => {
     e.preventDefault();
@@ -21,7 +22,7 @@ const useLoginHook = () => {
           setLoginError(res.data.info);
         }
         if (res.data.isUserExist === true) {
-          login(inputValue.email);
+          login(inputValue.email, res.data.userId);
         }
       })
       .catch((err) => {
@@ -29,10 +30,12 @@ const useLoginHook = () => {
       });
   };
 
-  const login = (email) => {
+  const login = (email, userId) => {
     localStorage.setItem("email", email);
+    localStorage.setItem("userId", userId);
     setIsAuth(true);
     setCurrentUser(email);
+    setUserId(userId);
   };
   return { login, handleSubmit };
 };

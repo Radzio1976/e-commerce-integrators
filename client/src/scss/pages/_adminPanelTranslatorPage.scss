@@ -1,0 +1,29 @@
+.control-panel-container {
+    display: flex;
+    justify-content: space-between;
+    width: 75%;
+    padding-top: 20px;
+    .control-panel-left-box {
+        width: 49%;
+            input {
+                @include input;
+                margin-top: 5px;
+            }
+            button {
+                @include button;
+            }
+    }
+    .control-panel-right-box {
+        width: 49%;
+        .status-box {
+            background-color: #fff;
+            color: black;
+            width: 95%;
+            padding: 20px;
+            height: 352px;
+            border-radius: 10px;
+            @include box-shadow;
+        }
+    }
+}
+    

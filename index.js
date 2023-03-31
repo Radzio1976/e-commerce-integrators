@@ -17,6 +17,7 @@ const login = require("./httpRequests/login");
 const usersIntegrators = require("./httpRequests/usersIntegrators");
 const addAmpApi = require("./httpRequests/addAmpApi");
 const getAmpApi = require("./httpRequests/getAmpApi");
+const changeAmpApi = require("./httpRequests/changeAmpApi");
 const downloadFile = require("./utils/downloadFile");
 const shopGoldAmpPolskaProducts = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaProducts");
 const shopGoldAmpPolskaUpdate = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaUpdate");
@@ -81,6 +82,10 @@ app.post("/shopGold-ampPolska", (req, res) => {
         if (result.length === 1) {
           if (data.action === "addAmpApi") {
             addAmpApi(req, res, ampPolska, data, result);
+          }
+          if (data.action === "changeAmpApi") {
+            //const data = req.body;
+            changeAmpApi(req, res, ampPolska, data, result);
           }
           if (data.action === "getAmpApi") {
             getAmpApi(res, ampPolska, result);

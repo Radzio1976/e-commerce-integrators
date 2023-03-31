@@ -6,7 +6,10 @@ import AddUser from "./components/AddUser";
 import Login from "./components/Login";
 import Nav from "./components/Nav";
 import Admin from "./components/Admin";
-import ShopGoldAmp from "./components/ShopgoldAmp";
+
+import ShopGoldAMPPolska from "./components/AdminPanel/ShopGoldAMPPolska";
+import ShopGoldKellys from "./components/AdminPanel/ShopGoldKellys";
+import ShopGoldFHSahs from "./components/AdminPanel/ShopGoldFHSahs";
 
 import AppState from "./hooks/AppState";
 
@@ -32,7 +35,12 @@ const App = () => {
           <Route path="/add-user" element={<AddUser />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
-          <Route path="/ShopGold-AMPPolska" element={<ShopGoldAmp />} />
+          <Route
+            path="/admin/shopgold-amppolska"
+            element={<ShopGoldAMPPolska />}
+          />
+          <Route path="/admin/shopgold-fhsahs" element={<ShopGoldFHSahs />} />
+          <Route path="/admin/shopgold-kellys" element={<ShopGoldKellys />} />
         </Routes>
       </BrowserRouter>
     </div>

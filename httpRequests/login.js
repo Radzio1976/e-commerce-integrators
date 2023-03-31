@@ -17,6 +17,7 @@ module.exports = async function (req, res, usersdb) {
         if (results.length === 1) {
           res.send({
             isUserExist: true,
+            userId: results[0]._id,
             info: "Użytkownik zalogowany pomyślnie",
           });
           console.log("Użytkownik zalogowany pomyślnie");

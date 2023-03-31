@@ -1,6 +1,20 @@
 import { createGlobalState } from "react-hooks-global-state";
 
 const initialState = {
+  adminPanelMenu: [
+    {
+      url: "/admin/shopgold-amppolska",
+      name: "AMP Polska",
+    },
+    {
+      url: "/admin/shopgold-fhsahs",
+      name: "FH Sahs",
+    },
+    {
+      url: "/admin/shopgold-kellys",
+      name: "Kellys",
+    },
+  ],
   inputValue: {
     company: "",
     nip: "",
@@ -11,8 +25,10 @@ const initialState = {
     password2: "",
     productsApi: "",
     qtyApi: "",
+    pricesApi: "",
     changeProductsApi: "",
     changeQtyApi: "",
+    changePricesApi: "",
   },
   companyError: "",
   nipError: "",
@@ -35,6 +51,7 @@ const initialState = {
 const { useGlobalState } = createGlobalState(initialState);
 
 const AppState = () => {
+  const [adminPanelMenu, setAdminPanelMenu] = useGlobalState("adminPanelMenu");
   const [inputValue, setInputValue] = useGlobalState("inputValue");
   const [companyError, setCompanyError] = useGlobalState("companyError");
   const [nipError, setNipError] = useGlobalState("nipError");
@@ -58,6 +75,8 @@ const AppState = () => {
     useGlobalState("userIntegrators");
 
   return {
+    adminPanelMenu,
+    setAdminPanelMenu,
     inputValue,
     setInputValue,
     companyError,

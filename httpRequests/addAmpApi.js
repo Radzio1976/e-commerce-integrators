@@ -3,6 +3,7 @@ module.exports = function (req, res, ampPolska, data, result) {
     {
       productsApi: data.productsApi,
       qtyApi: data.qtyApi,
+      pricesApi: data.pricesApi,
       userID: result[0]._id,
     },
     (error, result) => {
@@ -13,7 +14,7 @@ module.exports = function (req, res, ampPolska, data, result) {
           error
         );
       } else {
-        res.send("Dane API AMP Polska dodane pomyślnie");
+        res.send({ isJoined: true });
         console.log("Dane API AMP Polska dodane pomyślnie");
       }
     }
