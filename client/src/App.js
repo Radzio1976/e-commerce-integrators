@@ -13,6 +13,8 @@ import ShopGoldFHSahs from "./components/AdminPanel/ShopGoldFHSahs";
 
 import AppState from "./hooks/AppState";
 
+const WS_URL = "ws://127.0.0.1:3000";
+
 const App = () => {
   const { setIsAuth, setCurrentUser } = AppState();
 

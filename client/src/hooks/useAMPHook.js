@@ -2,83 +2,88 @@ import Axios from "axios";
 import AppState from "./AppState";
 
 const useAMPHook = () => {
-  const { currentUser, userId, inputValue, setIsJoined } = AppState();
-  const addApi = (e) => {
+  const { currentUser, userId, inputValue, setIsJoined, setStatusBoxText } =
+    AppState();
+  const addApi = (e, action, pathName) => {
     e.preventDefault();
     const data = {
-      action: "addAmpApi",
+      action,
       currentUser: currentUser,
       productsApi: inputValue.productsApi,
       qtyApi: inputValue.qtyApi,
       pricesApi: inputValue.pricesApi,
     };
-    Axios.post("/shopgold-amppolska", data)
+    Axios.post(`${pathName}`, data)
       .then((res) => {
-        console.log(res.data);
-        setIsJoined(res.data.setIsJoined);
+        console.log("Udało się dodać adresy API");
+        if (res.data.setIsJoined) {
+          setIsJoined(true);
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  const changeApi = (e) => {
+  const changeApi = (e, action, pathName) => {
     e.preventDefault();
     const data = {
-      action: "changeAmpApi",
+      action,
       currentUser: currentUser,
       userId: userId,
       changeProductsApi: inputValue.changeProductsApi,
       changeQtyApi: inputValue.changeQtyApi,
       changePricesApi: inputValue.changePricesApi,
     };
-    Axios.post("/shopgold-amppolska", data)
+    Axios.post(`${pathName}`, data)
       .then((res) => {
-        console.log(res.data);
-        setIsJoined(res.data.setIsJoined);
+        console.log("Udało się zmienić adresy API");
+        if (res.data.setIsJoined) {
+          setIsJoined(true);
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  const getAMPProductsFile = () => {
+  const getProductsFile = (action, pathName) => {
     const data = {
-      action: "getAMPProductsFile",
+      action,
       currentUser: currentUser,
     };
-    Axios.post("/shopgold-amppolska", data)
+    Axios.post(`${pathName}`, data)
       .then((res) => {
-        console.log(res.data);
+        console.log("Sukces");
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  const getAMPUpdateFile = () => {
-    console.log("Działa");
+  const getProductsAvailibilityFile = (action, pathName) => {
     const data = {
-      action: "getAMPUpdateFile",
+      action,
       currentUser: currentUser,
     };
-    Axios.post("/shopgold-amppolska", data)
+    Axios.post(`${pathName}`, data)
       .then((res) => {
-        console.log(res.data);
+        setStatusBoxText(res.data);
+        console.log("Sukces");
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  const getAMPPricesFile = () => {
+  const getPricesFile = (action, pathName) => {
     const data = {
-      action: "getAMPPricesFile",
+      action,
       currentUser: currentUser,
     };
-    Axios.post("/shopgold-amppolska", data)
+    Axios.post(`${pathName}`, data)
       .then((res) => {
-        console.log(res.data);
+        console.log("Sukces");
       })
       .catch((error) => {
         console.log(error);
@@ -87,9 +92,9 @@ const useAMPHook = () => {
   return {
     addApi,
     changeApi,
-    getAMPProductsFile,
-    getAMPUpdateFile,
-    getAMPPricesFile,
+    getProductsFile,
+    getProductsAvailibilityFile,
+    getPricesFile,
   };
 };
 

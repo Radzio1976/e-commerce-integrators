@@ -12,6 +12,9 @@ const { MongoClient } = require("mongodb");
 const port = process.env.PORT || 3001;
 const uri = process.env.MONGODB_URI;
 
+const http = require("http");
+const websocket = require("ws");
+
 const addUser = require("./httpRequests/addUser");
 const login = require("./httpRequests/login");
 const usersIntegrators = require("./httpRequests/usersIntegrators");
@@ -24,6 +27,7 @@ const shopGoldAmpPolskaUpdate = require("./xmlIntegrators/shopGoldAmpPolska/shop
 const shopGoldAmpPolskaPrices = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaPrices");
 
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json({ limit: "50mb", extended: true }));
 app.use(express.static(path.join(__dirname, "./client/build")));
@@ -146,6 +150,9 @@ app.post("/shopGold-ampPolska", (req, res) => {
                     );
                   }
                   if (result.length === 1) {
+                    res.send(
+                      "Ten użytkownik ma dodane adresy API Shopgold AMP Polska"
+                    );
                     const urlResult = result[0].qtyApi;
                     const userIdResult = result[0].userID;
                     const inputFileName = "ampupdate.xml";

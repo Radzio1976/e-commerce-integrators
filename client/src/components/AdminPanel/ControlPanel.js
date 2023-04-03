@@ -15,14 +15,15 @@ const ControlPanel = () => {
     isAuth,
     setCurrentUser,
     setUserId,
+    statusBoxText,
   } = AppState();
   const { handleChange } = useInputChangeHook();
   const {
     addApi,
     changeApi,
-    getAMPProductsFile,
-    getAMPUpdateFile,
-    getAMPPricesFile,
+    getProductsFile,
+    getProductsAvailibilityFile,
+    getPricesFile,
   } = useAMPHook();
 
   useEffect(() => {
@@ -34,7 +35,6 @@ const ControlPanel = () => {
     };
     Axios.post("/shopGold-ampPolska", data)
       .then((res) => {
-        console.log(res.data);
         setInputValue({
           ...inputValue,
           changeProductsApi: res.data.productsApi,
@@ -52,8 +52,10 @@ const ControlPanel = () => {
     <div className="control-panel-container">
       <div className="control-panel-left-box">
         {!isJoined ? (
-          <div id="AddAmpApi">
-            <form onSubmit={(e) => addApi(e)}>
+          <div className="add-api-container">
+            <form
+              onSubmit={(e) => addApi(e, "addAmpApi", "/shopgold-amppolska")}
+            >
               <label>
                 Adres API pliku z produktami
                 <input
@@ -85,7 +87,7 @@ const ControlPanel = () => {
             </form>
           </div>
         ) : (
-          <div id="ChangeAmpApi">
+          <div className="change-api-container">
             <form>
               <label>
                 Podstawowy plik z produktami
@@ -114,23 +116,46 @@ const ControlPanel = () => {
                   onChange={(e) => handleChange(e)}
                 ></input>
               </label>
-              <button onClick={(e) => changeApi(e)}>Zmień</button>
+              <button
+                onClick={(e) =>
+                  changeApi(e, "changeAmpApi", "/shopgold-amppolska")
+                }
+              >
+                Zmień
+              </button>
             </form>
           </div>
         )}
-        <div id="startUpdatesContainer">
-          <button onClick={getAMPProductsFile}>
+        <div className="start-updates-container">
+          <button
+            onClick={() =>
+              getProductsFile("getAMPProductsFile", "/shopgold-amppolska")
+            }
+          >
             Pobierz plik z bazą produktów
           </button>
-          <button onClick={getAMPUpdateFile}>
+          <button
+            onClick={() =>
+              getProductsAvailibilityFile(
+                "getAMPUpdateFile",
+                "/shopgold-amppolska"
+              )
+            }
+          >
             Pobierz plik aktualizacyjny
           </button>
-          <button onClick={getAMPPricesFile}>Pobierz plik z cenami</button>
+          <button
+            onClick={() =>
+              getPricesFile("getAMPPricesFile", "/shopgold-amppolska")
+            }
+          >
+            Pobierz plik z cenami
+          </button>
         </div>
       </div>
       <div className="control-panel-right-box">
         <div className="status-box">
-          <p></p>
+          <p>{statusBoxText}</p>
         </div>
       </div>
     </div>

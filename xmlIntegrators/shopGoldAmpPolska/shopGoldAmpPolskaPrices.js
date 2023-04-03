@@ -17,6 +17,8 @@ module.exports = function (userId) {
           let urls = [];
 
           for (let i = 0; i < items.length; i++) {
+            delete items[i].$;
+
             delete items[i].sku;
 
             delete items[i].url;
@@ -90,9 +92,9 @@ module.exports = function (userId) {
 
             delete items[i].name;
 
-            console.log(
-              `Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`
-            );
+            // console.log(
+            //   `Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`
+            // );
           }
           let finalData = {};
           finalData.Produkty = [];

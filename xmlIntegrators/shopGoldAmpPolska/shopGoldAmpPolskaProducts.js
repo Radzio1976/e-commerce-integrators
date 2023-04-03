@@ -27,6 +27,8 @@ module.exports = function (userId) {
           items = productsWithoutBug;
 
           for (let i = 0; i < items.length; i++) {
+            delete items[i].$;
+
             delete items[i].sku;
 
             delete items[i].url;
@@ -116,7 +118,11 @@ module.exports = function (userId) {
             };
             delete items[i].id;
 
-            if (items[i].photos[0].length === 47) {
+            console.log(items[i].photos[0].length);
+            if (
+              items[i].photos[0].length === 47 ||
+              items[i].photos[0].length === 22
+            ) {
               delete items[i].photos;
             } else {
               let photosArray = items[i].photos[0].photo;

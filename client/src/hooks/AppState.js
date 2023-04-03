@@ -46,6 +46,7 @@ const initialState = {
   userId: "",
   isJoined: false,
   userIntegrators: [],
+  statusBoxText: "",
 };
 
 const { useGlobalState } = createGlobalState(initialState);
@@ -73,6 +74,7 @@ const AppState = () => {
   const [isJoined, setIsJoined] = useGlobalState("isJoined");
   const [userIntegrators, setUserIntegrators] =
     useGlobalState("userIntegrators");
+  const [statusBoxText, setStatusBoxText] = useGlobalState("statusBoxText");
 
   return {
     adminPanelMenu,
@@ -111,6 +113,8 @@ const AppState = () => {
     setIsJoined,
     userIntegrators,
     setUserIntegrators,
+    statusBoxText,
+    setStatusBoxText,
   };
 };
 
