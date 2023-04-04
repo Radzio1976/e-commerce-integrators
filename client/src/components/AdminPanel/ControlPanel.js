@@ -3,8 +3,8 @@ import Axios from "axios";
 
 import AppState from "../../hooks/AppState";
 import useInputChangeHook from "../../hooks/useInputChangeHook";
-import useAMPHook from "../../hooks/useAMPHook";
-const ControlPanel = () => {
+import useIntegratorsHook from "../../hooks/useIntegratorsHook";
+const ControlPanel = (props) => {
   const {
     inputValue,
     setInputValue,
@@ -24,16 +24,13 @@ const ControlPanel = () => {
     getProductsFile,
     getProductsAvailibilityFile,
     getPricesFile,
-  } = useAMPHook();
+  } = useIntegratorsHook();
 
   useEffect(() => {
     setUserId(localStorage.getItem("userId"));
     setCurrentUser(localStorage.getItem("email"));
-    const data = {
-      action: "getAmpApi",
-      currentUser: currentUser,
-    };
-    Axios.post("/shopGold-ampPolska", data)
+    const data = props.data;
+    Axios.post(`${props.pathName}`, data)
       .then((res) => {
         setInputValue({
           ...inputValue,
@@ -54,7 +51,9 @@ const ControlPanel = () => {
         {!isJoined ? (
           <div className="add-api-container">
             <form
-              onSubmit={(e) => addApi(e, "addAmpApi", "/shopgold-amppolska")}
+              onSubmit={(e) =>
+                addApi(e, props.addApiAction, `${props.pathName}`)
+              }
             >
               <label>
                 Adres API pliku z produktami
@@ -118,7 +117,7 @@ const ControlPanel = () => {
               </label>
               <button
                 onClick={(e) =>
-                  changeApi(e, "changeAmpApi", "/shopgold-amppolska")
+                  changeApi(e, props.changeApiAction, `${props.pathName}`)
                 }
               >
                 Zmień
@@ -129,7 +128,7 @@ const ControlPanel = () => {
         <div className="start-updates-container">
           <button
             onClick={() =>
-              getProductsFile("getAMPProductsFile", "/shopgold-amppolska")
+              getProductsFile(props.getProductsFileAction, `${props.pathName}`)
             }
           >
             Pobierz plik z bazą produktów
@@ -137,8 +136,8 @@ const ControlPanel = () => {
           <button
             onClick={() =>
               getProductsAvailibilityFile(
-                "getAMPUpdateFile",
-                "/shopgold-amppolska"
+                props.getProductsAvailibilityFileAction,
+                `${props.pathName}`
               )
             }
           >
@@ -146,7 +145,7 @@ const ControlPanel = () => {
           </button>
           <button
             onClick={() =>
-              getPricesFile("getAMPPricesFile", "/shopgold-amppolska")
+              getPricesFile(props.getPricesFileAction, `${props.pathName}`)
             }
           >
             Pobierz plik z cenami

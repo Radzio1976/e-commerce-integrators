@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppState from "../../hooks/AppState";
 
+import Header from "../Header";
 import LeftMenu from "./LeftMenu";
 import ControlPanel from "./ControlPanel";
 
@@ -17,6 +18,7 @@ const ShopGoldFHSahs = () => {
 
   return (
     <div className="admin-panel-main-container">
+      <Header />
       <div className="translator-page-container translator-main-container">
         <LeftMenu />
         <ControlPanel />
