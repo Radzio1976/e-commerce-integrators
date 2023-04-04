@@ -92,9 +92,9 @@ module.exports = function (userId) {
 
             delete items[i].name;
 
-            // console.log(
-            //   `Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`
-            // );
+            console.log(
+              `Przetwarzam dane: ${((i / items.length) * 100).toFixed(0)} %`
+            );
           }
           let finalData = {};
           finalData.Produkty = [];

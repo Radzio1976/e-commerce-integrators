@@ -1,6 +1,28 @@
 import { createGlobalState } from "react-hooks-global-state";
 
 const initialState = {
+  mainMenu: [
+    {
+      url: "/",
+      name: "home",
+    },
+    {
+      url: "/about",
+      name: "about",
+    },
+    {
+      url: "/admin",
+      name: "sign in",
+    },
+    {
+      url: "/sign-up",
+      name: "sign up",
+    },
+    {
+      url: "/contact",
+      name: "contact",
+    },
+  ],
   adminPanelMenu: [
     {
       url: "/admin/shopgold-amppolska",
@@ -52,6 +74,7 @@ const initialState = {
 const { useGlobalState } = createGlobalState(initialState);
 
 const AppState = () => {
+  const [mainMenu, setMainMenu] = useGlobalState("mainMenu");
   const [adminPanelMenu, setAdminPanelMenu] = useGlobalState("adminPanelMenu");
   const [inputValue, setInputValue] = useGlobalState("inputValue");
   const [companyError, setCompanyError] = useGlobalState("companyError");
@@ -77,6 +100,8 @@ const AppState = () => {
   const [statusBoxText, setStatusBoxText] = useGlobalState("statusBoxText");
 
   return {
+    mainMenu,
+    setMainMenu,
     adminPanelMenu,
     setAdminPanelMenu,
     inputValue,

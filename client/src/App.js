@@ -31,11 +31,9 @@ const App = () => {
   return (
     <div id="App">
       <BrowserRouter>
-        <Nav />
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/add-user" element={<AddUser />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
           <Route
             path="/admin/shopgold-amppolska"

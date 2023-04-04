@@ -6,13 +6,14 @@ import LeftMenu from "./LeftMenu";
 import ControlPanel from "./ControlPanel";
 
 const ShopGoldKellys = () => {
+  const { isAuth } = AppState();
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   if (!loggedIn) {
-  //     navigate("/");
-  //   }
-  // });
+  useEffect(() => {
+    if (!isAuth) {
+      navigate("/");
+    }
+  });
 
   return (
     <div className="admin-panel-main-container">
