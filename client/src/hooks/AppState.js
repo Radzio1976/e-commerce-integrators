@@ -15,7 +15,7 @@ const initialState = {
       name: "sign in",
     },
     {
-      url: "/sign-up",
+      url: "/add-user",
       name: "sign up",
     },
     {
