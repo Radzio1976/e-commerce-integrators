@@ -209,6 +209,12 @@ app.post("/shopGold-fhSahs", (req, res) => {
           if (data.action === "addFHSahsApi") {
             addApi(req, res, fhSahs, data, result);
           }
+          if (data.action === "changeFHSahsApi") {
+            changeApi(req, res, fhSahs, data, result);
+          }
+          if (data.action === "getFHSahsApi") {
+            getApi(res, fhSahs, result);
+          }
         }
       }
     });
