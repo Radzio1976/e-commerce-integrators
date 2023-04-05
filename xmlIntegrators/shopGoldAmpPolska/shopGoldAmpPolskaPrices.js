@@ -3,7 +3,7 @@ var parseString = require("xml2js").parseString;
 const { toXML } = require("jstoxml");
 
 module.exports = function (userId) {
-  fs.readFile("./input/ampproducts.xml", "utf8", (err, data) => {
+  fs.readFile(`./input/ampproducts-${userId}.xml`, "utf8", (err, data) => {
     if (err) {
       console.log("Coś poszło nie tak", err);
     } else {
@@ -123,14 +123,14 @@ module.exports = function (userId) {
             today.getSeconds();
 
           fs.writeFile(
-            `./client/src/ampOutputFiles/ampprices-${time}-userid-${userId}.xml`,
+            `./client/src/outputFiles/ampprices-${userId}.xml`,
             finalXML,
             (err) => {
               if (err) {
                 console.log("Nie udało się zapisać pliku", err);
               } else {
                 console.log("Plik został zapisany :)");
-                fs.readdir("./client/src/ampOutputFiles", (err, files) => {
+                fs.readdir("./client/src/outputFiles", (err, files) => {
                   if (err) console.log(err);
                   else {
                     console.log(files);

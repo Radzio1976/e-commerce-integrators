@@ -19,6 +19,7 @@ const downloadFile = require("./utils/downloadFile");
 const shopGoldAmpPolskaProducts = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaProducts");
 const shopGoldAmpPolskaUpdate = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaUpdate");
 const shopGoldAmpPolskaPrices = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaPrices");
+const shopGoldFHSahsProducts = require("./xmlIntegrators/shopGoldFHSahs/shopGoldFHSahsProducts");
 
 const app = express();
 
@@ -108,7 +109,7 @@ app.post("/shopGold-ampPolska", (req, res) => {
                   if (result.length === 1) {
                     const urlResult = result[0].productsApi;
                     const userIdResult = result[0].userID;
-                    const inputFileName = "ampproducts.xml";
+                    const inputFileName = `ampproducts-${userIdResult}.xml`;
                     downloadFile(
                       urlResult,
                       userIdResult,
@@ -145,7 +146,7 @@ app.post("/shopGold-ampPolska", (req, res) => {
                     );
                     const urlResult = result[0].qtyApi;
                     const userIdResult = result[0].userID;
-                    const inputFileName = "ampupdate.xml";
+                    const inputFileName = `ampupdate-${userIdResult}.xml`;
                     downloadFile(
                       urlResult,
                       userIdResult,
@@ -178,7 +179,7 @@ app.post("/shopGold-ampPolska", (req, res) => {
                   if (result.length === 1) {
                     const urlResult = result[0].productsApi;
                     const userIdResult = result[0].userID;
-                    const inputFileName = "ampproducts.xml";
+                    const inputFileName = `ampproducts-${userIdResult}.xml`;
                     downloadFile(
                       urlResult,
                       userIdResult,
@@ -214,6 +215,41 @@ app.post("/shopGold-fhSahs", (req, res) => {
           }
           if (data.action === "getFHSahsApi") {
             getApi(res, fhSahs, result);
+          }
+          if (data.action === "getFHSahsProductsFile") {
+            fhSahs
+              .find({
+                userID: result[0]._id,
+              })
+              .toArray((error, result) => {
+                if (error) {
+                  res.send("Nie udało się pobrać informacji z bazy danych");
+                  console.log(
+                    "Nie udało się pobrać informacji z bazy danych",
+                    error
+                  );
+                } else {
+                  if (result.length === 0) {
+                    res.send(
+                      "Ten użytkownik nie ma dodanych adresów API Shopgold FHSahs"
+                    );
+                    console.log(
+                      "Ten użytkownik nie ma dodanych adresów API Shopgold FHSahs"
+                    );
+                  }
+                  if (result.length === 1) {
+                    const urlResult = result[0].productsApi;
+                    const userIdResult = result[0].userID;
+                    const inputFileName = `fhsahsproducts-${userIdResult}.xml`;
+                    downloadFile(
+                      urlResult,
+                      userIdResult,
+                      shopGoldFHSahsProducts,
+                      inputFileName
+                    );
+                  }
+                }
+              });
           }
         }
       }
