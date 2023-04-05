@@ -194,6 +194,26 @@ app.post("/shopGold-ampPolska", (req, res) => {
     });
 });
 
+app.post("/shopGold-fhSahs", (req, res) => {
+  const data = req.body;
+  usersdb
+    .find({
+      email: data.currentUser,
+    })
+    .toArray((error, result) => {
+      if (error) {
+        res.send("Nie udało się znależć użytkownika");
+        console.log("Nie udało się znależć użytkownika", error);
+      } else {
+        if (result.length === 1) {
+          if (data.action === "addFHSahsApi") {
+            addApi(req, res, fhSahs, data, result);
+          }
+        }
+      }
+    });
+});
+
 app.listen(port, () =>
   console.log(`Serwer nasłuchuje na porcie: http://localhost:${port}`)
 );
