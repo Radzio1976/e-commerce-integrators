@@ -1,9 +1,9 @@
 const ObjectID = require("mongodb").ObjectId;
 
-module.exports = function (req, res, ampPolska, data, result) {
+module.exports = function (req, res, collection, data, result) {
   const id = data.userId;
   console.log(data);
-  ampPolska.updateMany(
+  collection.updateMany(
     { userID: new ObjectID(id) },
     {
       $set: {
@@ -20,7 +20,7 @@ module.exports = function (req, res, ampPolska, data, result) {
           error,
         });
       } else {
-        ampPolska.find({}).toArray((error, result) => {
+        collection.find({}).toArray((error, result) => {
           if (error) {
             console.log(error);
             res.send({ error });

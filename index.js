@@ -4,23 +4,17 @@ const path = require("path");
 var parseString = require("xml2js").parseString;
 const { toXML } = require("jstoxml");
 require("dotenv").config();
-const axios = require("axios");
 var cors = require("cors");
 const bodyParser = require("body-parser");
-const ProgressBar = require("progress");
 const { MongoClient } = require("mongodb");
 const port = process.env.PORT || 3001;
 const uri = process.env.MONGODB_URI;
 
-const http = require("http");
-const websocket = require("ws");
-
 const addUser = require("./httpRequests/addUser");
 const login = require("./httpRequests/login");
-const usersIntegrators = require("./httpRequests/usersIntegrators");
-const addAmpApi = require("./httpRequests/addAmpApi");
-const getAmpApi = require("./httpRequests/getAmpApi");
-const changeAmpApi = require("./httpRequests/changeAmpApi");
+const addApi = require("./httpRequests/addApi");
+const getApi = require("./httpRequests/getApi");
+const changeApi = require("./httpRequests/changeApi");
 const downloadFile = require("./utils/downloadFile");
 const shopGoldAmpPolskaProducts = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaProducts");
 const shopGoldAmpPolskaUpdate = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaUpdate");
@@ -68,10 +62,6 @@ app.post("/login", (req, res) => {
   login(req, res, usersdb);
 });
 
-app.post("/users-integrators", (req, res) => {
-  usersIntegrators(req, res, usersdb, ampPolska, fhSahs);
-});
-
 app.post("/shopGold-ampPolska", (req, res) => {
   const data = req.body;
   usersdb
@@ -85,14 +75,14 @@ app.post("/shopGold-ampPolska", (req, res) => {
       } else {
         if (result.length === 1) {
           if (data.action === "addAmpApi") {
-            addAmpApi(req, res, ampPolska, data, result);
+            addApi(req, res, ampPolska, data, result);
           }
           if (data.action === "changeAmpApi") {
             //const data = req.body;
-            changeAmpApi(req, res, ampPolska, data, result);
+            changeApi(req, res, ampPolska, data, result);
           }
           if (data.action === "getAmpApi") {
-            getAmpApi(res, ampPolska, result);
+            getApi(res, ampPolska, result);
           }
           if (data.action === "getAMPProductsFile") {
             ampPolska
