@@ -2,6 +2,8 @@ const fs = require("fs");
 var parseString = require("xml2js").parseString;
 const { toXML } = require("jstoxml");
 
+const uploadFileToFTP = require("../../utils/uploadFileToFTP");
+
 module.exports = function (userId) {
   fs.readFile(`./input/fhsahsproducts-${userId}.xml`, "utf8", (err, data) => {
     if (err) {
@@ -24,9 +26,9 @@ module.exports = function (userId) {
             const nrKatalogowy = products[i].symbol[0]
               .replace(/(?:\\[rn])+/g, "")
               .trim();
-            console.log(nrKatalogowy);
             const nazwaProduktu = products[i].name[0]
               .replace(/(?:\\[rn])+/g, "")
+              .replace("<", " ")
               .trim();
             const metaSlowa =
               "części rowerowe, akcesoria rowerowe, części do rowerów, akcesoria do rowerów, sklep rowerowy";
@@ -144,7 +146,6 @@ module.exports = function (userId) {
               bruttoPriceWithMargin = (bruttoPrice * 1.4).toFixed(2); // cena > 50 zł (marża 40%)
             }
             products[i].Cena_brutto = bruttoPriceWithMargin; // cena końcowa brutto z odpowiednią marżą
-            //console.log(products[i].Cena_brutto);
             // Zdjęcia
             let photosArray = zdjeciaProduktu;
             // Zdjęcie główne
@@ -154,7 +155,6 @@ module.exports = function (userId) {
             // Zdjęcia dodatkowe
             let Zdjecie = [];
             if (photosArray.length > 1) {
-              console.log(photosArray);
               for (let i = 1; i < photosArray.length; i++) {
                 Zdjecie.push({ Zdjecie: { Zdjecie_link: photosArray[i] } });
               }
@@ -232,19 +232,6 @@ module.exports = function (userId) {
             .replace(/<(\/)?__cdata[^>]*>/g, "]]>");
 
           const finalXML = xmlVersion.concat(xml);
-          let today = new Date();
-          let time =
-            today.getFullYear() +
-            "-" +
-            (today.getMonth() + 1) +
-            "-" +
-            today.getDate() +
-            "-" +
-            today.getHours() +
-            "-" +
-            today.getMinutes() +
-            "-" +
-            today.getSeconds();
 
           fs.writeFile(
             `./client/src/outputFiles/fhsahsproducts-${userId}.xml`,
@@ -254,6 +241,10 @@ module.exports = function (userId) {
                 console.log("Nie udało się zapisać pliku", err);
               } else {
                 console.log("Plik został zapisany :)");
+                uploadFileToFTP(
+                  `./client/src/outputFiles/fhsahsproducts-${userId}.xml`,
+                  `public_html/import/fhsahsproducts-${userId}.xml`
+                );
                 fs.readdir("./client/src/outputFiles", (err, files) => {
                   if (err) console.log(err);
                   else {

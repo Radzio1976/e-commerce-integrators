@@ -2,6 +2,8 @@ const fs = require("fs");
 var parseString = require("xml2js").parseString;
 const { toXML } = require("jstoxml");
 
+const uploadFileToFTP = require("../../utils/uploadFileToFTP");
+
 module.exports = function (userId) {
   fs.readFile(`./input/ampupdate-${userId}.xml`, "utf8", (err, data) => {
     if (err) {
@@ -92,6 +94,10 @@ module.exports = function (userId) {
                 console.log("Nie udało się zapisać pliku", err);
               } else {
                 console.log("Plik został zapisany :)");
+                uploadFileToFTP(
+                  `./client/src/outputFiles/ampupdate-${userId}.xml`,
+                  `public_html/import/ampupdate-${userId}.xml`
+                );
                 fs.readdir("./client/src/outputFiles", (err, files) => {
                   if (err) console.log(err);
                   else {
