@@ -22,6 +22,7 @@ const shopGoldAmpPolskaPrices = require("./xmlIntegrators/shopGoldAmpPolska/shop
 const shopGoldFHSahsProducts = require("./xmlIntegrators/shopGoldFHSahs/shopGoldFHSahsProducts");
 const shopGoldFHSahsUpdate = require("./xmlIntegrators/shopGoldFHSahs/shopGoldFHSahsUpdate");
 const shopGoldFHSahsPrices = require("./xmlIntegrators/shopGoldFHSahs/shopGoldFHSahsPrices");
+const shopGoldKellysProducts = require("./xmlIntegrators/shopGoldKellys/shopGoldKellysProducts");
 
 const app = express();
 
@@ -338,6 +339,37 @@ app.post("/shopGold-kellys", (req, res) => {
         }
         if (data.action === "getKellysApi") {
           getApi(res, kellys, result);
+        }
+        if (data.action === "getKellysProductsFile") {
+          kellys.find({ userID: result[0]._id }).toArray((error, result) => {
+            if (error) {
+              res.send("Nie udało się pobrać informacji z bazy danych");
+              console.log(
+                "Nie udało się pobrać informacji z bazy danych",
+                error
+              );
+            } else {
+              if (result.length === 0) {
+                res.send(
+                  "Ten użytkownik nie ma dodanych adresów API Shopgold FHSahs"
+                );
+                console.log(
+                  "Ten użytkownik nie ma dodanych adresów API Shopgold FHSahs"
+                );
+              }
+              if (result.length === 1) {
+                const urlResult = result[0].productsApi;
+                const userIdResult = result[0].userID;
+                const inputFileName = `kellysproducts-${userIdResult}.xml`;
+                downloadFile(
+                  urlResult,
+                  userIdResult,
+                  shopGoldKellysProducts,
+                  inputFileName
+                );
+              }
+            }
+          });
         }
       }
     }
