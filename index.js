@@ -56,6 +56,7 @@ mongoDBConnection();
 const usersdb = client.db("e-commerce-integrators").collection("users");
 const ampPolska = client.db("e-commerce-integrators").collection("ampPolska");
 const fhSahs = client.db("e-commerce-integrators").collection("fhSahs");
+const kellys = client.db("e-commerce-integrators").collection("kellys");
 
 app.post("/addUser", (req, res) => {
   addUser(req, res, usersdb);
@@ -253,7 +254,7 @@ app.post("/shopGold-fhSahs", (req, res) => {
                 }
               });
           }
-          if (data.action === "getFHSUpdateFile") {
+          if (data.action === "getFHSahsUpdateFile") {
             fhSahs.find({ userID: result[0]._id }).toArray((error, result) => {
               if (error) {
                 res.send("Nie udało się pobrać informacji z bazy danych");
@@ -284,7 +285,7 @@ app.post("/shopGold-fhSahs", (req, res) => {
               }
             });
           }
-          if (data.action === "getFHSPricesFile") {
+          if (data.action === "getFHSahsPricesFile") {
             fhSahs.find({ userID: result[0]._id }).toArray((error, result) => {
               if (error) {
                 res.send("Nie udało się pobrać informacji z bazy danych");
@@ -318,6 +319,29 @@ app.post("/shopGold-fhSahs", (req, res) => {
         }
       }
     });
+});
+
+app.post("/shopGold-kellys", (req, res) => {
+  const data = req.body;
+
+  usersdb.find({ email: data.currentUser }).toArray((error, result) => {
+    if (error) {
+      res.send("Nie udało się znależć użytkownika");
+      console.log("Nie udało się znależć użytkownika", error);
+    } else {
+      if (result.length === 1) {
+        if (data.action === "addKellysApi") {
+          addApi(req, res, kellys, data, result);
+        }
+        if (data.action === "changeKellysApi") {
+          changeApi(req, res, kellys, data, result);
+        }
+        if (data.action === "getKellysApi") {
+          getApi(res, kellys, result);
+        }
+      }
+    }
+  });
 });
 
 app.listen(port, () =>

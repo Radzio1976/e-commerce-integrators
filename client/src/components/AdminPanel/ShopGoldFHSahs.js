@@ -17,8 +17,8 @@ const ShopGoldFHSahs = () => {
   const addApiAction = "addFHSahsApi";
   const changeApiAction = "changeFHSahsApi";
   const getProductsFileAction = "getFHSahsProductsFile";
-  const getProductsAvailibilityFileAction = "getFHSUpdateFile";
-  const getPricesFileAction = "getFHSPricesFile";
+  const getProductsAvailibilityFileAction = "getFHSahsUpdateFile";
+  const getPricesFileAction = "getFHSahsPricesFile";
 
   // useEffect(() => {
   //   if (!isAuth) {

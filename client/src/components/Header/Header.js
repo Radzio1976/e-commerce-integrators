@@ -19,7 +19,9 @@ const Header = () => {
               return (
                 <>
                   {isAuth && menuEl.url === "/admin" ? null : (
-                    <li onClick={() => navigate(menuEl.url)}>{menuEl.name}</li>
+                    <li key={i} onClick={() => navigate(menuEl.url)}>
+                      {menuEl.name}
+                    </li>
                   )}
                 </>
               );
