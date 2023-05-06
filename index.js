@@ -23,6 +23,7 @@ const shopGoldFHSahsProducts = require("./xmlIntegrators/shopGoldFHSahs/shopGold
 const shopGoldFHSahsUpdate = require("./xmlIntegrators/shopGoldFHSahs/shopGoldFHSahsUpdate");
 const shopGoldFHSahsPrices = require("./xmlIntegrators/shopGoldFHSahs/shopGoldFHSahsPrices");
 const shopGoldKellysProducts = require("./xmlIntegrators/shopGoldKellys/shopGoldKellysProducts");
+const shopGoldKellysUpdate = require("./xmlIntegrators/shopGoldKellys/shopGoldKellysUpdate");
 
 const app = express();
 
@@ -351,10 +352,10 @@ app.post("/shopGold-kellys", (req, res) => {
             } else {
               if (result.length === 0) {
                 res.send(
-                  "Ten użytkownik nie ma dodanych adresów API Shopgold FHSahs"
+                  "Ten użytkownik nie ma dodanych adresów API Shopgold Kellys"
                 );
                 console.log(
-                  "Ten użytkownik nie ma dodanych adresów API Shopgold FHSahs"
+                  "Ten użytkownik nie ma dodanych adresów API Shopgold Kellys"
                 );
               }
               if (result.length === 1) {
@@ -365,6 +366,37 @@ app.post("/shopGold-kellys", (req, res) => {
                   urlResult,
                   userIdResult,
                   shopGoldKellysProducts,
+                  inputFileName
+                );
+              }
+            }
+          });
+        }
+        if (data.action === "getKellysUpdateFile") {
+          kellys.find({ userID: result[0]._id }).toArray((error, result) => {
+            if (error) {
+              res.send("Nie udało się pobrać informacji z bazy danych");
+              console.log(
+                "Nie udało się pobrać informacji z bazy danych",
+                error
+              );
+            } else {
+              if (result.length === 0) {
+                res.send(
+                  "Ten użytkownik nie ma dodanych adresów API Shopgold Kellys"
+                );
+                console.log(
+                  "Ten użytkownik nie ma dodanych adresów API Shopgold Kellys"
+                );
+              }
+              if (result.length === 1) {
+                const urlResult = result[0].qtyApi;
+                const userIdResult = result[0].userID;
+                const inputFileName = `kellysupdate-${userIdResult}.xml`;
+                downloadFile(
+                  urlResult,
+                  userIdResult,
+                  shopGoldKellysUpdate,
                   inputFileName
                 );
               }
