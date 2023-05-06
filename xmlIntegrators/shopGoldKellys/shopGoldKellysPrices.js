@@ -5,7 +5,7 @@ const { toXML } = require("jstoxml");
 const uploadFileToFTP = require("../../utils/uploadFileToFTP");
 
 module.exports = function (userId) {
-  fs.readFile(`./input/kellysupdate-${userId}.xml`, "utf8", (err, data) => {
+  fs.readFile(`./input/kellysprices-${userId}.xml`, "utf8", (err, data) => {
     if (err) {
       console.log("Coś poszło nie tak", err);
     } else {
@@ -25,8 +25,9 @@ module.exports = function (userId) {
           });
           for (let i = 0; i < accessories.length; i++) {
             const id = accessories[i]["g:id"][0].trim();
-            const quantity = accessories[i]["g:quantity"][0].trim();
-            const qty = Number(quantity).toFixed(2);
+            const price = accessories[i]["g:price"][0]
+              .replace("PLN", "")
+              .trim();
             //const availability = accessories[i]["g:availability"][0].trim(); // availibolity = out of stock === quantity = "0"
             delete accessories[i]["g:availability"];
             delete accessories[i]["g:size"];
@@ -47,17 +48,15 @@ module.exports = function (userId) {
               __cdata: [id],
             };
 
-            /* Tworzy tag xml Dostepnosc */
-            accessories[i].Dostepnosc = {
-              __cdata: [],
-            };
+            /* Tworzy tag xml Cena_brutto */
+            accessories[i].Cena_brutto = Number(price).toFixed(2);
+            delete accessories[i]["g:price"];
 
-            if (Number(qty) === 0) {
-              accessories[i].Dostepnosc.__cdata = ["Wyprzedane"];
-            } else if (Number(qty) > 0 && Number(qty) < 6) {
-              accessories[i].Dostepnosc.__cdata = ["Na wyczerpaniu"];
-            } else if (Number(qty) > 5) {
-              accessories[i].Dostepnosc.__cdata = ["Dostępny"];
+            /* Tworzy tag xml Status w zależności od tego czy cena jest różna od 0 */
+            if (Number(price) === 0) {
+              accessories[i].Status = "nie";
+            } else {
+              accessories[i].Status = "tak";
             }
 
             console.log(
@@ -80,7 +79,7 @@ module.exports = function (userId) {
           const finalXML = xmlVersion.concat(xml);
 
           fs.writeFile(
-            `./client/src/outputFiles/kellysupdate-${userId}.xml`,
+            `./client/src/outputFiles/kellysprices-${userId}.xml`,
             finalXML,
             (err) => {
               if (err) {
@@ -88,8 +87,8 @@ module.exports = function (userId) {
               } else {
                 console.log("Plik został zapisany :)");
                 uploadFileToFTP(
-                  `./client/src/outputFiles/kellysupdate-${userId}.xml`,
-                  `public_html/import/kellysupdate-${userId}.xml`
+                  `./client/src/outputFiles/kellysprices-${userId}.xml`,
+                  `public_html/import/kellysprices-${userId}.xml`
                 );
                 fs.readdir("./client/src/outputFiles", (err, files) => {
                   if (err) console.log(err);
