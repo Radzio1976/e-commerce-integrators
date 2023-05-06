@@ -15,7 +15,6 @@ const login = require("./httpRequests/login");
 const addApi = require("./httpRequests/addApi");
 const getApi = require("./httpRequests/getApi");
 const changeApi = require("./httpRequests/changeApi");
-const downloadFile = require("./utils/downloadFile");
 const getProductsFile = require("./httpRequests/getProductsFile");
 const getUpdateFile = require("./httpRequests/getUpdateFile");
 const getPricesFile = require("./httpRequests/getPricesFile");
