@@ -164,11 +164,11 @@ module.exports = function (userId) {
               delete products[i].image2;
             }
             // Kategoria
-            /*
-                        products[i].Kategoria = {
-                          __cdata: ["OSTATNIO DODANE/NIESKLASYFIKOWANE"]
-                        };
-                        */
+
+            products[i].Kategoria = {
+              __cdata: ["OSTATNIO DODANE/NIESKLASYFIKOWANE"],
+            };
+
             if (
               products[i].opis[0].replace(/(?:\\[rn])+/g, "").trim().length ===
               0
