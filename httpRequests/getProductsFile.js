@@ -1,6 +1,6 @@
 const downloadFile = require("../utils/downloadFile");
 
-module.exports = function (collection, result, fileName, xmlIntegrator) {
+module.exports = function (res, collection, result, fileName, xmlIntegrator) {
   collection
     .find({
       userID: result[0]._id,
@@ -11,11 +11,9 @@ module.exports = function (collection, result, fileName, xmlIntegrator) {
         console.log("Nie udało się pobrać informacji z bazy danych", error);
       } else {
         if (result.length === 0) {
-          res.send(
-            "Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska"
-          );
+          res.send("Ten użytkownik nie ma dodanych adresów API z tej hurtowni");
           console.log(
-            "Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska"
+            "Ten użytkownik nie ma dodanych adresów API z tej hurtowni"
           );
         }
         if (result.length === 1) {

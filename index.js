@@ -17,6 +17,7 @@ const getApi = require("./httpRequests/getApi");
 const changeApi = require("./httpRequests/changeApi");
 const downloadFile = require("./utils/downloadFile");
 const getProductsFile = require("./httpRequests/getProductsFile");
+const getUpdateFile = require("./httpRequests/getUpdateFile");
 const shopGoldAmpPolskaProducts = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaProducts");
 const shopGoldAmpPolskaUpdate = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaUpdate");
 const shopGoldAmpPolskaPrices = require("./xmlIntegrators/shopGoldAmpPolska/shopGoldAmpPolskaPrices");
@@ -94,6 +95,7 @@ app.post("/shopGold-ampPolska", (req, res) => {
           }
           if (data.action === "getAMPProductsFile") {
             getProductsFile(
+              res,
               ampPolska,
               result,
               "ampproducts",
@@ -102,40 +104,13 @@ app.post("/shopGold-ampPolska", (req, res) => {
           }
 
           if (data.action === "getAMPUpdateFile") {
-            ampPolska
-              .find({ userID: result[0]._id })
-              .toArray((error, result) => {
-                if (error) {
-                  res.send("Nie udało się pobrać informacji z bazy danych");
-                  console.log(
-                    "Nie udało się pobrać informacji z bazy danych",
-                    error
-                  );
-                } else {
-                  if (result.length === 0) {
-                    res.send(
-                      "Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska"
-                    );
-                    console.log(
-                      "Ten użytkownik nie ma dodanych adresów API Shopgold AMP Polska"
-                    );
-                  }
-                  if (result.length === 1) {
-                    res.send(
-                      "Ten użytkownik ma dodane adresy API Shopgold AMP Polska"
-                    );
-                    const urlResult = result[0].qtyApi;
-                    const userIdResult = result[0].userID;
-                    const inputFileName = `ampupdate-${userIdResult}.xml`;
-                    downloadFile(
-                      urlResult,
-                      userIdResult,
-                      shopGoldAmpPolskaUpdate,
-                      inputFileName
-                    );
-                  }
-                }
-              });
+            getUpdateFile(
+              res,
+              ampPolska,
+              result,
+              "ampupdate",
+              shopGoldAmpPolskaUpdate
+            );
           }
 
           if (data.action === "getAMPPricesFile") {
@@ -198,6 +173,7 @@ app.post("/shopGold-fhSahs", (req, res) => {
           }
           if (data.action === "getFHSahsProductsFile") {
             getProductsFile(
+              res,
               fhSahs,
               result,
               "fhsahsproducts",
@@ -205,35 +181,13 @@ app.post("/shopGold-fhSahs", (req, res) => {
             );
           }
           if (data.action === "getFHSahsUpdateFile") {
-            fhSahs.find({ userID: result[0]._id }).toArray((error, result) => {
-              if (error) {
-                res.send("Nie udało się pobrać informacji z bazy danych");
-                console.log(
-                  "Nie udało się pobrać informacji z bazy danych",
-                  error
-                );
-              } else {
-                if (result.length === 0) {
-                  res.send(
-                    "Ten użytkownik nie ma dodanych adresów API Shopgold FHSahs"
-                  );
-                  console.log(
-                    "Ten użytkownik nie ma dodanych adresów API Shopgold FHSahs"
-                  );
-                }
-                if (result.length === 1) {
-                  const urlResult = result[0].qtyApi;
-                  const userIdResult = result[0].userID;
-                  const inputFileName = `fhsahsupdate-${userIdResult}.xml`;
-                  downloadFile(
-                    urlResult,
-                    userIdResult,
-                    shopGoldFHSahsUpdate,
-                    inputFileName
-                  );
-                }
-              }
-            });
+            getUpdateFile(
+              res,
+              fhSahs,
+              result,
+              "fhsahsupdate",
+              shopGoldFHSahsUpdate
+            );
           }
           if (data.action === "getFHSahsPricesFile") {
             fhSahs.find({ userID: result[0]._id }).toArray((error, result) => {
@@ -291,6 +245,7 @@ app.post("/shopGold-kellys", (req, res) => {
         }
         if (data.action === "getKellysProductsFile") {
           getProductsFile(
+            res,
             kellys,
             result,
             "kellysproducts",
@@ -298,35 +253,13 @@ app.post("/shopGold-kellys", (req, res) => {
           );
         }
         if (data.action === "getKellysUpdateFile") {
-          kellys.find({ userID: result[0]._id }).toArray((error, result) => {
-            if (error) {
-              res.send("Nie udało się pobrać informacji z bazy danych");
-              console.log(
-                "Nie udało się pobrać informacji z bazy danych",
-                error
-              );
-            } else {
-              if (result.length === 0) {
-                res.send(
-                  "Ten użytkownik nie ma dodanych adresów API Shopgold Kellys"
-                );
-                console.log(
-                  "Ten użytkownik nie ma dodanych adresów API Shopgold Kellys"
-                );
-              }
-              if (result.length === 1) {
-                const urlResult = result[0].qtyApi;
-                const userIdResult = result[0].userID;
-                const inputFileName = `kellysupdate-${userIdResult}.xml`;
-                downloadFile(
-                  urlResult,
-                  userIdResult,
-                  shopGoldKellysUpdate,
-                  inputFileName
-                );
-              }
-            }
-          });
+          getUpdateFile(
+            res,
+            kellys,
+            result,
+            "kellysupdate",
+            shopGoldKellysUpdate
+          );
         }
         if (data.action === "getKellysPricesFile") {
           kellys.find({ userID: result[0]._id }).toArray((error, result) => {
