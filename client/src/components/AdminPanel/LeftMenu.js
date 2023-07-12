@@ -22,6 +22,7 @@ const LeftMenu = () => {
               </li>
             );
           })}
+          <li>Aktualizuj wszystko</li>
         </ul>
       </div>
     </div>
